@@ -105,7 +105,7 @@ model Warehouse {
 
 model Admin {
   id            Int      @id @default(autoincrement())
-  username      String 
+  username      String   @unique
   email         String 
   password      String 
   address       String 

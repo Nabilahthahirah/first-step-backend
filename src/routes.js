@@ -8,7 +8,7 @@ const { verifyTokenAdmin } = require("../src/api/middlewares/verifyTokenMiddlewa
 
 // api routes
 router.use("/api/category", crudCategory);
-// router.use("/api/admin", adminRoute);
+router.use("/api/admin", adminRoute);
 router.use("/api/products", crudProduct);
 router.use("/api/paymentmethod", crudPaymentMethod);
 router.use("/api/user", crudUser);

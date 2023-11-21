@@ -53,16 +53,16 @@ const update = async (pathParams, params) => {
     console.log(id,value,"<<<<<<< Services id");
     console.log(pathParams,params,"<<<<<<< Services" );
 
-    if (!id || !value) {
-      throw new CustomAPIError("Please provide all of the required fields", 400);
-    }
+    // if (!id || !value) {
+    //   throw new CustomAPIError("Please provide all of the required fields", 400);
+    // }
 
     const updatedPaymentMethod = await prisma.payment_Method.update({
       where: {
-        id : +id,
+        id : +pathParams,
       },
       data: {
-        value: value,
+        value: params,
         updated_at: new Date(),
       },
     });
