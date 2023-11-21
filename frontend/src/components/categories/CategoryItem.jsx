@@ -14,7 +14,7 @@ const CategoryItem = () => {
         const response = await axios.get('https://private-7380c-firststep2.apiary-mock.com/api/category')
         const result = await response.data
 
-        console.log(result.data)
+        console.log(result?.data)
 
         setCategory(result)
 
@@ -34,8 +34,8 @@ const CategoryItem = () => {
 
   return (
     <div>
-      {category.data ? (
-      category.data.map(item => (
+      {category?.data ? (
+      category.data?.map(item => (
         <div key={item.id}>
           <p>Name: {item.category_name}</p>
           <img src={item.image} alt={staticImage} style={{ maxWidth: '100px' }} />
