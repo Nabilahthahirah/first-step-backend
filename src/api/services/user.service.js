@@ -1,189 +1,149 @@
 const prisma = require("../../lib/prisma");
-const bcrypt = require("bcryptjs");
-const CustomAPIError = require("../middlewares/custom-error");
+const bcrypt = require('bcrypt');
 const { generateToken } = require("../../lib/jwt");
+const CustomAPIError = require("../middlewares/custom-error");
 
-const fetchAllUsers = async () => {
-  const users = await prisma.user.findMany({
-    include: {
-      address: true, // Include associated addresses
-      cart: true, // Include associated carts
-    },
-  });
-  return users;
-};
-
-const fetchSingleUsersById = async (params) => {
-  const { id } = params;
-  const user = await prisma.user.findUnique({
-    where: { id: +id },
-    include: {
-      cart: { include: { cart: true } },
-      address: true,
-    },
-  });
-
-  if (!user) {
-    throw new CustomAPIError(`No user with id ${id}`, 400);
-  }
-  return user;
-};
-
-const postUser = async (data) => {
-  let { username, email, password, phone } = data;
+// Register User
+const registerUser = async (userData) => {
+  const { username, email, password, phone } = userData;
 
   try {
-    const existedUserUsername = await prisma.user.findUnique({
-      where: { username: username },
+    // Check if username is taken
+    const existingUsername = await prisma.user.findUnique({
+      where: { username },
     });
-    if (existedUserUsername) {
-      throw new CustomAPIError(`Username is taken`, 400);
-    }
-    const existedUserEmail = await prisma.user.findUnique({
-      where: { email: email },
-    });
-    if (existedUserEmail) {
-      throw new CustomAPIError(`Email is registered before`, 400);
+    if (existingUsername) {
+      throw new CustomAPIError('Username is taken', 400);
     }
 
-    // hash the password using bcrypt
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await prisma.$transaction(async (tx) => {
-      const createdUser = await tx.user.create({
-        data: {
-          username,
-          email,
-          password: hashedPassword, // Use the hashed password here
-          phone,
-        },
-        include: {
-          address: true,
-          cart: true,
-        },
-      });
-      await tx.cart.create({ data: { user_id: createdUser.id } });
-      return createdUser;
+    // Check if email is registered before
+    const existingEmail = await prisma.user.findUnique({
+      where: { email },
     });
+    if (existingEmail) {
+      throw new CustomAPIError('Email is registered before', 400);
+    }
+
+    // Hash the password using bcrypt
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create user with hashed password
+    const user = await prisma.user.create({
+      data: {
+        username,
+        email,
+        password: hashedPassword,
+        phone,
+      },
+    });
+
+    // Generate token after registration
+    const token = generateToken(user);
+
+    return { user, token };
   } catch (error) {
-    console.log(error);
+    console.error('Error registering user:', error);
     throw new CustomAPIError(`${error.message}`, 500);
   }
 };
 
-const getUser = async (data) => {
-    const { username, password } = data;
-    if (!username) {
-      throw new CustomAPIError("Invalid username or password", 401);
-    }
-    if (!password) {
-      throw new CustomAPIError("Invalid username or password", 401);
-    }
-    // Step 1: Check if the username exists
+// Login User
+const loginUser = async (username, password) => {
+  try {
+    // Find user by username
     const user = await prisma.user.findUnique({
-      where: {
-        username,
-      },
+      where: { username },
     });
-  
+
     if (!user) {
-      throw new CustomAPIError("Invalid username or password", 401);
+      throw new CustomAPIError('Invalid username or password', 401);
     }
-  
-    // Step 2: Compare passwords
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-  
-    if (!isPasswordValid) {
-      throw new CustomAPIError("Invalid username or password", 401);
+
+    // Compare passwords
+    const passwordMatch = await bcrypt.compare(password, user.password || '');
+
+    if (!passwordMatch) {
+      throw new CustomAPIError('Invalid username or password', 401);
     }
-  
-    // Generate JWT token
+
+    // Generate token after successful login
     const token = generateToken(user);
-  
-    return token;
+
+    return { user, token };
+  } catch (error) {
+    console.error('Error logging in:', error);
+    throw new CustomAPIError('Invalid username or password', 401);
+  }
 };
 
-const putUser = async (pathParams, params) => {
-    try {
-        const { id } = pathParams;
-    
-        const user = await prisma.user.findUnique({
-            where: { id: +id },
-        });
+// Update User
+const updateUser = async (userId, newData) => {
+  try {
+    // Update user data
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: newData,
+    });
 
-        console.log(user);
-        if (!user) {
-            throw new CustomAPIError(`no user with id of ${id}`, 400);
-        }
-    
-        const {
-            username,
-            email,
-            password,
-            phone,
-        } = params;
-        console.log(params);
-        if (password) {
-            var hashedPassword = await bcrypt.hash(password, 10);
-        }
-        await prisma.user.update({
-            where: {
-            id: +id,
-            },
-            data: {
-            username: username || user.username,
-            email: email || user.email,
-            password: hashedPassword || user.password,
-            phone: phone || user.phone,
-            },
-        });
-    
-        const updateUser = await prisma.user.findUnique({
-            where: { id: +id },
-        });
-        return updateUser;
-    } catch (error) {
-        console.log(error);
-        throw new CustomAPIError(`Error: ${error.message}`, 500);
-    }
+    return updatedUser;
+  } catch (error) {
+    console.error('Error updating user:', error);
+    throw new CustomAPIError(`Error: ${error.message}`, 500);
+  }
 };
 
-const destroyUser = async (params) => {
-    // console.log(params);
-    try {
-        const { id } = params;
-    
-        const user = await prisma.user.findUnique({
-            where: { id: +id },
-        });
-    
-        if (!user) {
-            throw new CustomAPIError(`No user with id ${id}`, 400);
-        }
-    
-        await prisma.user.delete({
-            where: {
-            id: +id,
-            },
-            include: { address: true, cart:true },
-        });
-    
-        return {
-            deletedUser: user,
-        };
-        } catch (error) {
-        console.log(error);
-        throw new CustomAPIError(
-            `Error: ${error.message}`,
-            error.statusCode || 500
-        );
-    }
+// Delete User
+const deleteUser = async (userId) => {
+  try {
+    // Hapus alamat terkait
+    await prisma.address.deleteMany({
+      where: { user_id: userId },
+    });
+
+    // Hapus pengguna
+    const deletedUser = await prisma.user.delete({
+      where: { id: userId },
+    });
+
+    return deletedUser;
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    throw new CustomAPIError(`Error: ${error.message}`, 500);
+  }
+};
+
+// Get User By Id
+const getUserById = async (userId) => {
+  try {
+    // Find user by id
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    return user;
+  } catch (error) {
+    console.error('Error getting user by id:', error);
+    throw new CustomAPIError(`Error: ${error.message}`, 500);
+  }
+};
+
+// Get All Users
+const getAllUsers = async () => {
+  try {
+    // Find all users
+    const users = await prisma.user.findMany();
+    return users;
+  } catch (error) {
+    console.error('Error getting all users:', error);
+    throw new CustomAPIError(`Error: ${error.message}`, 500);
+  }
 };
 
 module.exports = {
-  fetchAllUsers,
-  fetchSingleUsersById,
-  postUser,
-  getUser,
-  putUser,
-  destroyUser
+  registerUser,
+  loginUser,
+  updateUser,
+  deleteUser,
+  getUserById,
+  getAllUsers,
 };
