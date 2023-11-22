@@ -4,27 +4,24 @@ const bcrypt = require("bcryptjs");
 const { generateToken } = require("../../lib/jwt");
 
 const loginAdmin = async (username, password) => {
-    try {
-        const admin = await prisma.admin.findUnique({ where: { username } });
-        if (!admin) {
-            throw new CustomAPIError("Invalid credentials", 400);
-        }
-    
-        const passwordMatch = await bcrypt.compare(password, admin.password);
-        if (!passwordMatch) {
-            throw new CustomAPIError("Invalid credentials", 400);
-        }
-    
-        const token = generateToken(admin);
-        console.log(token,"<<<<<token")
-        return token;
-    } catch (error) {
-        console.log(error);
-        throw new CustomAPIError(
-            `Error: ${error.message}`,
-            error.statusCode || 500
-        );
+  try {
+    const admin = await prisma.admin.findUnique({ where: { username } });
+    if (!admin) {
+      throw new CustomAPIError("Invalid credentials", 400);
     }
+
+    const passwordMatch = await bcrypt.compare(password, admin.password);
+    if (!passwordMatch) {
+      throw new CustomAPIError("Invalid credentials", 400);
+    }
+
+    const token = generateToken(admin);
+    console.log(token, "<<<<<token");
+    return token;
+  } catch (error) {
+    console.log(error);
+    throw new CustomAPIError(`Error: ${error.message}`, error.statusCode || 500);
+  }
 };
 
 const postAdmin = async (payload) => {
@@ -54,7 +51,51 @@ const postAdmin = async (payload) => {
   }
 };
 
+const putAdmin = async (params, payload) => {
+  const { username, email, password, address } = payload;
+  const { id } = params;
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const result = await prisma.admin.update({
+      where: {
+        id: +id,
+      },
+      data: { 
+        username, 
+        password: hashedPassword,
+        email,
+        address
+     },
+    });
+
+    return result;
+  } catch (error) {
+    console.log(error);
+    throw new CustomAPIError(`Error: ${error.message}`, 500);
+  }
+};
+
+const destroyAdmin = async (params) => {
+  const { id } = params;
+  try {
+    const result = await prisma.admin.delete({
+      where: {
+        id: +id,
+      },
+      include: { warehouse: true },
+    });
+
+    return result;
+  } catch (error) {
+    console.log(error);
+    throw new CustomAPIError(`Error: ${error.message}`, 500);
+  }
+};
+
 module.exports = {
   loginAdmin,
   postAdmin,
+  putAdmin,
+  destroyAdmin
 };
