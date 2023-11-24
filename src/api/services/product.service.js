@@ -1,5 +1,4 @@
 const prisma = require("../../lib/prisma");
-const slugify = require("../../lib/slugify");
 const CustomAPIError = require("../middlewares/custom-error");
 
 const fetchAllProducts = async () => { //solved
@@ -10,7 +9,7 @@ const fetchAllProducts = async () => { //solved
   return products;
 };
 
-const postFullProduct = async (data) => { //solved
+const postFullProduct = async (data) => {
   try {
     let {
       name,
@@ -53,7 +52,110 @@ const postFullProduct = async (data) => { //solved
   }
 };
 
+const fetchSingleProductById = async (data) => {
+  let product;
+  console.log
+  // Check if the input is numeric, assuming it's an ID
+  if (!isNaN(data)) {
+    product = await prisma.product.findUnique({
+      where: {
+        id: +data, // Convert data to a number
+      },
+      include: {
+        category: true,
+        warehouse: true,
+        product_detail: {
+          orderBy: {
+            id: "asc",
+          },
+        },
+      },
+    });
+  } 
+
+  if (!product) {
+    throw new CustomAPIError(`No product found with id: ${data}`, 400);
+  }
+
+  return product;
+};
+
+const deleteFullProduct = async (id) => {
+  const product = await prisma.product.findUnique({
+    where: { id: +id },
+    include: { product_detail: true },
+  });
+
+  if (!product) {
+    throw new CustomAPIError(`No product with id of ${id}`, 400);
+  }
+
+  // Delete Product
+  await prisma.product.delete({
+    where: { id: +id },
+    include: {
+      product_detail: true,
+    },
+  });
+
+  return {
+    deletedProduct: product,
+  };
+};
+
+
+// Product Detail
+const postProductDetail = async (productId, data) => {
+  try {
+    let {
+      product_id = +productId,
+      photo,
+      color,
+      price = +price,
+      stock = +stock,
+      weight = +weight,
+    } = data;
+
+    const createdProductDetail = await prisma.product_Detail.create({
+      data: {
+        product_id,
+        photo,
+        color,
+        stock: parseInt(stock), // Mengubah string menjadi nilai integer
+        price: parseFloat(price), // Mengubah string menjadi nilai float
+        weight: parseFloat(weight), // Mengubah string menjadi nilai float
+      },
+    });
+    console.log(createdProductDetail,"<<<<<<<<<<")
+    return createdProductDetail;
+  } catch (error) {
+    throw new Error(`Error in creating product detail: ${error.message}`);
+  }
+}
+
+const deleteOneProductDetail = async (id) => {
+  const productDetail = await prisma.product_Detail.findUnique({
+    where: { id: +id },
+  });
+
+  if (!productDetail) {
+    throw new CustomAPIError(`No product detail with id of ${id}`, 400);
+  }
+
+  await prisma.product_Detail.delete({
+    where: { id: +id },
+  });
+
+  return {
+    deletedProductDetail: productDetail,
+  };
+};
+
 module.exports = {
     fetchAllProducts,
-    postFullProduct
+    postFullProduct,
+    fetchSingleProductById,
+    deleteFullProduct,
+    postProductDetail,
+    deleteOneProductDetail
   };

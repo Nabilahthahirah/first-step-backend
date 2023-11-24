@@ -24,7 +24,7 @@ model User {
 
 model Address {
   id            Int      @id @default(autoincrement())
-  user_id       Int      @unique
+  user_id       Int      
   address       String  
   city          String 
   postal_code   String 
@@ -37,7 +37,7 @@ model Address {
 
 model Cart {
   id            Int      @id @default(autoincrement())
-  user_id       Int
+  user_id       Int   @unique
   created_at    DateTime      @default(now())
   updated_at    DateTime      @default(now())
   user          User     @relation(fields: [user_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
@@ -67,8 +67,8 @@ model Product {
   updated_at      DateTime      @default(now())
   Cart_Product    Cart_Product[]
   product_detail  Product_Detail[]
-  category        Category  @relation(fields: [category_id], references: [id])
-  warehouse       Warehouse @relation(fields: [warehouse_id], references: [id])
+  category        Category  @relation(fields: [category_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  warehouse       Warehouse @relation(fields: [warehouse_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }
 
 model Product_Detail {
@@ -81,7 +81,7 @@ model Product_Detail {
   weight        Int  
   created_at    DateTime      @default(now())
   updated_at    DateTime      @default(now())
-  product       Product  @relation(fields: [product_id], references: [id])
+  product       Product  @relation(fields: [product_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }
 
 model Category {
