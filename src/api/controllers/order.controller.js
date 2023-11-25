@@ -68,36 +68,6 @@ const createOrder = async (req, res) => {
   }
 }
 
-// const updateOrder = async (req, res) => {
-//   try {
-
-//     // const orderId = req.params.id
-//     // const { cart_id, address_id, shipping_price, price, status } = req.body
-
-//     // const updatedOrder = await orderServices.update(orderId, {
-//     //   cart_id,
-//     //   address_id,
-//     //   shipping_price,
-//     //   price,
-//     //   status,
-//     // })
-
-//     const updatedOrders = await orderServices.update(
-//       req.params,
-//       req.body
-//     )
-
-//     res.status(200).json({
-//       status: "success",
-//       message: "Update Order Succesfully",
-//       data: updatedOrders,
-//     })
-
-//   } catch (error) {
-//     throw new CustomAPIError(`Error: ${error.message}`, error.statusCode || 500)
-//   }
-// }
-
 const deleteOrder = async (req, res) => {
   try {
 

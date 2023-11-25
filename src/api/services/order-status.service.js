@@ -10,9 +10,9 @@ const findAllOrderStatuses = async () => {
   }
 }
 
-const findOneOrderStatus = async (orderStatusId) => {
+const updateOrderStatus = async (orderStatusId) => {
   try {
-    const orderStatus = await prisma.orderStatus.findUnique({
+    const orderStatus = await prisma.orderStatus.update({
       where: {
         id: +orderStatusId,
       },
@@ -28,61 +28,8 @@ const findOneOrderStatus = async (orderStatusId) => {
   }
 }
 
-// const createOrderStatus = async (orderId, status) => {
-//   try {
-//     const newOrderStatus = await prisma.orderStatus.create({
-//       data: {
-//         order: {
-//           connect: {
-//             id: +orderId,
-//           },
-//         },
-//         status,
-//       },
-//     })
-
-//     return newOrderStatus
-//   } catch (error) {
-//     throw error
-//   }
-// }
-
-// const updateOrderStatus = async (orderStatusId, status) => {
-//   try {
-//     const updatedOrderStatus = await prisma.orderStatus.update({
-//       where: {
-//         id: +orderStatusId,
-//       },
-//       data: {
-//         status,
-//       },
-//     })
-
-//     return updatedOrderStatus
-//   } catch (error) {
-//     throw error
-//   }
-// }
-
-// const destroyOrderStatus = async (orderStatusId) => {
-//   try {
-//     const deletedOrderStatus = await prisma.orderStatus.delete({
-//       where: {
-//         id: +orderStatusId,
-//       },
-//     })
-
-//     return deletedOrderStatus
-//   } catch (error) {
-//     throw error
-//   }
-// }
-
 module.exports = {
-  // findAllOrderStatuses,
   findOneOrderStatus,
-  // createOrderStatus,
-  // updateOrderStatus,
-  // destroyOrderStatus,
+  updateOrderStatus,
 }
 
