@@ -22,7 +22,7 @@ const getAllUsers = async (req, res) => {
 
 const getUserId = async (req, res, next) => {
   try {
-    const userId = parseInt(req.params.userId);
+    const userId = parseInt(req.params.id);
     const user = await userServices.fetchUsersById(userId);
     res.json(user);
   } catch (error) {
