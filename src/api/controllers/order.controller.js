@@ -51,13 +51,6 @@ const createOrder = async (req, res) => {
 
     const { address_user, address_warehouse, cart_id } = req.body
 
-    // const newOrder = await orderServices.create({
-    //   cart_id,
-    //   address_id,
-    //   shipping_price,
-    //   price,
-    // })
-
     const orders = await orderServices.createOrder(address_user, address_warehouse, cart_id)
     
     if (!orders) {

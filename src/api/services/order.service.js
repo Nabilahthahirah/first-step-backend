@@ -109,8 +109,8 @@ const createOrder = async (address_user, address_warehouse, cart_id) => {
     const apiRajaOngkir = process.env.RAJA_ONGKIR
 
     const data = {
-      origin: warehouseAddress,
-      destination: userAddress,
+      origin: warehouseAddress.city_id,
+      destination: userAddress.city_id,
       weight: totalWeight,
       courier: 'jne',
     }
