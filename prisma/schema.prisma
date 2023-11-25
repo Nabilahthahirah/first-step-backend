@@ -25,14 +25,37 @@ model User {
 model Address {
   id            Int      @id @default(autoincrement())
   user_id       Int      @unique
-  address       String  
-  city          String 
-  postal_code   String 
+  address       String
+  city_id       Int
+  province_id   Int
+  postal_code   String
   phone         String
-  created_at    DateTime      @default(now())
-  updated_at    DateTime      @default(now())
+  created_at    DateTime @default(now())
+  updated_at    DateTime @default(now())
   user          User     @relation(fields: [user_id], references: [id])
   order         Order[]
+  city          City     @relation(fields: [city_id], references: [id])
+  province      Province @relation(fields: [province_id], references: [id])
+  warehouse     Warehouse[]
+}
+
+model City {
+  id         Int      @id
+  name       String
+  province_id Int
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  province   Province @relation(fields: [province_id], references: [id])
+  address    Address[]
+}
+
+model Province {
+  id         Int      @id
+  name       String
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  City       City[]
+  address    Address[]
 }
 
 model Cart {
@@ -94,13 +117,14 @@ model Category {
 
 model Warehouse {
   id              Int      @id @default(autoincrement())
-  admin_id        Int 
-  warehouse_name  String 
-  address         String 
-  created_at    DateTime      @default(now())
-  updated_at    DateTime      @default(now())
-  product         Product[] 
-  admin           Admin   @relation(fields: [admin_id], references: [id])  
+  admin_id        Int
+  warehouse_name  String
+  address_id      Int
+  created_at      DateTime @default(now())
+  updated_at      DateTime @default(now())
+  product         Product[]
+  admin           Admin    @relation(fields: [admin_id], references: [id])
+  address         Address  @relation(fields: [address_id], references: [id])
 }
 
 model Admin {
