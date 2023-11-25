@@ -38,6 +38,11 @@ model Address {
 model Cart {
   id            Int      @id @default(autoincrement())
   user_id       Int   @unique
+  shipping_cost Int?
+  total_payment Int           @default(0)
+  total_weight  Int           @default(0)
+  total_price   Int           @default(0)
+  courier       Courier?
   created_at    DateTime      @default(now())
   updated_at    DateTime      @default(now())
   user          User     @relation(fields: [user_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
@@ -45,11 +50,18 @@ model Cart {
   order         Order[]
 }
 
+enum Courier {
+  jne
+  pos
+  tiki
+}
+
 model Cart_Product {
   id            Int      @id @default(autoincrement())
   product_id    Int
   cart_id       Int
   quantity      Int
+  price         Int
   created_at    DateTime      @default(now())
   updated_at    DateTime      @default(now())
   cart          Cart     @relation(fields: [cart_id], references: [id])

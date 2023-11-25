@@ -2,6 +2,7 @@ const {
   showCart,
   deleteCart,
   addToCart,
+  resetCart
 } = require("../controllers/cart.controller");
 const { verifyTokenUser } = require("../middlewares/verifyTokenMiddleware");
 

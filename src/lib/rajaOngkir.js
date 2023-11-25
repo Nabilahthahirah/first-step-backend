@@ -1,9 +1,10 @@
 const axios = require('axios');
 
-const apiKey = '86ee504db8abb644b6a2324e98e3b5d8'; 
+const apiKey = '5ec0f25991ff8bd0711bbda776239a13'; 
 
 const getProvinceList = async () => {
     try {
+        const apiKey = '5ec0f25991ff8bd0711bbda776239a13'; 
         const response = await axios.get('https://api.rajaongkir.com/starter/province', {
             headers: {
                 key: apiKey, 
