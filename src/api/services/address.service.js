@@ -20,7 +20,7 @@ const createAddress = async (userId, addressData) => {
 const getAllAddresses = async (userId) => {
   try {
     const addresses = await prisma.address.findMany({
-      where: { user: { id: userId } }, // Perubahan di sini
+      where: { user: { id: userId } }, 
     });
 
     return addresses;
@@ -52,7 +52,7 @@ const updateAddress = async (userId, addressId, updatedData) => {
 const deleteAddress = async (userId, addressId) => {
   try {
     await prisma.address.delete({
-      where: { id: addressId, user: { id: userId } }, // Perubahan di sini
+      where: { id: addressId, user: { id: userId } }, 
     });
 
     return true;
