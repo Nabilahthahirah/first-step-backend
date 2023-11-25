@@ -1,5 +1,5 @@
-const CustomAPIError = require("../middlewares/custom-error");
-const userServices = require("../services/user.service");
+const CustomAPIError = require('../middlewares/custom-error');
+const userServices = require('../services/user.service');
 
 const getAllUsers = async (req, res) => {
   try {
@@ -8,33 +8,34 @@ const getAllUsers = async (req, res) => {
       throw new CustomAPIError(`No users were found`, 404);
     }
     res.status(200).json({
-      status: "success",
-      message: "Get All Users",
+      status: 'success',
+      message: 'Get All Users',
       data: users,
     });
   } catch (error) {
     res.status(error.statusCode || 500).json({
-      status: "error",
-      message: error.message || "Internal Server Error",
+      status: 'error',
+      message: error.message || 'Internal Server Error',
     });
   }
 };
 
-const getUserId = async (req, res) => {
-  const user = await userServices.fetchSingleUsersById(req.user);
-  return res.json({
-    status: "success",
-    message: `User Id ${req.user} is getted`,
-    data: user,
-  });
+const getUserId = async (req, res, next) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const user = await userServices.fetchUsersById(userId);
+    res.json(user);
+  } catch (error) {
+    next(error);
+  }
 };
 
 const registerUser = async (req, res) => {
   console.log(req.body);
   const user = await userServices.postUser(req.body);
   return res.json({
-    status: "success",
-    message: "User is created successfully",
+    status: 'success',
+    message: 'User is created successfully',
     data: user,
   });
 };
@@ -42,8 +43,8 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   const token = await userServices.getUser(req.body);
   return res.json({
-    status: "success",
-    message: "User is credential matched! Here is your token",
+    status: 'success',
+    message: 'User is credential matched! Here is your token',
     data: token,
   });
 };
@@ -51,8 +52,8 @@ const loginUser = async (req, res) => {
 const updateUser = async (req, res) => {
   const user = await userServices.putUser(req.user, req.body);
   return res.json({
-    status: "success",
-    message: "User is updated successfully",
+    status: 'success',
+    message: 'User is updated successfully',
     data: user,
   });
 };
@@ -60,8 +61,8 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
   const user = await userServices.destroyUser(req.user);
   return res.json({
-    status: "success",
-    message: "User is deleted successfully",
+    status: 'success',
+    message: 'User is deleted successfully',
     data: user,
   });
 };
@@ -72,5 +73,5 @@ module.exports = {
   registerUser,
   loginUser,
   updateUser,
-  deleteUser
+  deleteUser,
 };
