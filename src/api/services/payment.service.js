@@ -35,7 +35,8 @@ const findOne = async (params) => {
 
 const create = async (params) => {
   try {
-    const { order_id, cart_id, payment_method_id, total_price } = params;
+    const { order_id, payment_method_id, cart_id, total_price } = params;
+    console.log("params", params);
     const payment = await prisma.payment.create({
       data: {
         order_id: +order_id,
@@ -75,6 +76,21 @@ const update = async (pathParams, params) => {
 };
 
 const destroy = async (params) => {
+  try {
+    const { id } = params;
+    const payment = await prisma.payment.delete({
+      where: {
+        id: +id,
+      },
+    });
+    return payment;
+  } catch (error) {
+    console.log(error);
+    throw new CustomAPIError(`Error: ${error.message}`, 500);
+  }
+};
+
+const process = async (params) => {
   try {
     const { id } = params;
     const payment = await prisma.payment.delete({

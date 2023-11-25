@@ -1,8 +1,8 @@
 const CustomAPIError = require("../middlewares/custom-error");
 const paymentServices = require("../services/payment.service");
-
+const midtransClient = require("midtrans-client");
+require("dotenv").config();
 const getAllpayments = async (req, res) => {
-  //Solved
   try {
     const payments = await paymentServices.findAll(req.query);
     if (payments.length === 0) {
@@ -34,16 +34,30 @@ const getOnepayments = async (req, res) => {
   }
 };
 
-const newpayments = async (req, res) => {
+const newPayments = async (req, res) => {
   try {
-    const payments = await paymentServices.create(req.body);
-    if (!payments) {
-      throw new CustomAPIError(`No Payment with id ${req.params.id}`, 400);
-    }
-    res.status(201).json({
-      status: "success",
-      message: "Create New Payment Succesfully",
-      data: payments,
+    const { order_id, payment_method_id, cart_id, total_price } = req.body;
+    const snap = new midtransClient.Snap({
+      isProduction: false,
+      serverKey: process.env.MIDTRANS_SERVER_KEY,
+      clientKey: process.env.MIDTRANS_CLIENT_KEY,
+    });
+    const newPayments = await paymentServices.create(req.body);
+    const parameter = {
+      transaction_details: {
+        order_id: +order_id,
+        gross_amount: +total_price,
+      },
+      enabled_payments: payment_method_id,
+    };
+    snap.createTransaction(parameter).then((transaction) => {
+      const dataPayment = {
+        response: JSON.stringify(transaction),
+      };
+      const token = transaction.token;
+      res
+        .status(200)
+        .json({ message: "Success", dataPayment, token: token, newPayments });
     });
   } catch (error) {
     throw new CustomAPIError(
@@ -85,7 +99,7 @@ const deletePayment = async (req, res) => {
 module.exports = {
   getAllpayments,
   getOnepayments,
-  newpayments,
+  newPayments,
   updatePayment,
   deletePayment,
 };

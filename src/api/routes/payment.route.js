@@ -3,7 +3,7 @@ const router = require("express").Router();
 
 router.get("/", controllers.getAllpayments);
 router.get("/:id", controllers.getOnepayments);
-router.post("/", controllers.newpayments);
+router.post("/", controllers.newPayments);
 router.put("/:id", controllers.updatePayment);
 router.delete("/:id", controllers.deletePayment);
 
