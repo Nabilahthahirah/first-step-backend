@@ -1,7 +1,6 @@
 const prisma = require('../../lib/prisma');
 const CustomAPIError = require('../middlewares/custom-error');
 const { PrismaClient } = require('@prisma/client');
-const prisma = require('../../lib/prisma');
 
 const fetchAllUsers = async () => {
   const users = await prisma.user.findMany({
@@ -35,38 +34,38 @@ const fetchUsersById = async (userId) => {
 };
 
 const getCartProduct = async () => {
-  return await prisma.cartProduct.findMany();
+  return await prisma.cart_Product.findMany();
 };
 
-const addToCart = async (productId, quantity) => {
-  if (!productId || !quantity || isNaN(quantity) || quantity <= 0) {
+const addToCart = async (product_id, quantity) => {
+  if (!product_id || !quantity || isNaN(quantity) || quantity <= 0) {
     throw new CustomAPIError('Invalid data', 400);
   }
 
-  return await prisma.cartProduct.upsert({
-    where: { productId },
+  return await prisma.cart_Product.upsert({
+    where: { product_id },
     update: { quantity: { increment: quantity } },
-    create: { productId, quantity },
+    create: { product_id, quantity },
   });
 };
 
-const updateCartProduct = async (productId, newQuantity) => {
-  if (!productId || isNaN(newQuantity) || newQuantity <= 0) {
+const updateCartProduct = async (product_id, newQuantity) => {
+  if (!product_id || isNaN(newQuantity) || newQuantity <= 0) {
     throw new CustomAPIError('Invalid data', 400);
   }
 
-  return await prisma.cartProduct.update({
-    where: { productId },
+  return await prisma.cart_Product.update({
+    where: { product_id },
     data: { quantity: newQuantity },
   });
 };
 
-const removeFromCart = async (productId) => {
-  if (!productId) {
+const removeFromCart = async (product_id) => {
+  if (!product_id) {
     throw new CustomAPIError('Invalid data', 400);
   }
 
-  return await prisma.cartProduct.deleteMany({ where: { productId } });
+  return await prisma.cart_Product.deleteMany({ where: { product_id } });
 };
 
 module.exports = {

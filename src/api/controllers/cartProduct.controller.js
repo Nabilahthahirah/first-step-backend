@@ -11,13 +11,13 @@ const getCartProductController = async (req, res, next) => {
 
 const addToCartController = async (req, res, next) => {
   try {
-    const { productId, quantity } = req.body;
+    const { product_id, quantity } = req.body;
 
-    if (!productId || !quantity || isNaN(quantity) || quantity <= 0) {
+    if (!product_id || !quantity || isNaN(quantity) || quantity <= 0) {
       return res.status(400).json({ error: 'Invalid data' });
     }
 
-    await addToCart(productId, quantity);
+    await addToCart(product_id, quantity);
 
     const cartProduct = await getCartProduct();
     res.json(cartProduct);
@@ -28,13 +28,13 @@ const addToCartController = async (req, res, next) => {
 
 const updateCartProductController = async (req, res, next) => {
   try {
-    const { productId, quantity } = req.body;
+    const { product_id, quantity } = req.body;
 
-    if (!productId || !quantity || isNaN(quantity) || quantity <= 0) {
+    if (!product_id || !quantity || isNaN(quantity) || quantity <= 0) {
       return res.status(400).json({ error: 'Invalid data' });
     }
 
-    await updateCartProduct(productId, quantity);
+    await updateCartProduct(product_id, quantity);
 
     const cartProduct = await getCartProduct();
     res.json(cartProduct);
@@ -45,9 +45,9 @@ const updateCartProductController = async (req, res, next) => {
 
 const removeFromCartController = async (req, res, next) => {
   try {
-    const productId = req.params.productId;
+    const product_id = req.params.product_id;
 
-    await removeFromCart(productId);
+    await removeFromCart(product_id);
 
     const cartProduct = await getCartProduct();
     res.json(cartProduct);

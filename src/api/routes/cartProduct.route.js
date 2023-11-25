@@ -3,9 +3,9 @@ const { getCartProductController, addToCartController, updateCartProductControll
 
 const router = express.Router();
 
-router.get('/cart', getCartProductController);
-router.post('/cart/', addToCartController);
-router.put('/cart/', updateCartProductController);
-router.delete('/cart/', removeFromCartController);
+router.get('/', getCartProductController);
+router.post('/', addToCartController);
+router.put('/', updateCartProductController);
+router.delete('/', removeFromCartController);
 
 module.exports = router;
