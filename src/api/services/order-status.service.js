@@ -10,16 +10,21 @@ const findAllOrderStatuses = async () => {
   }
 }
 
-const updateOrderStatus = async (orderStatusId) => {
+const updateOrderStatus = async (status, id) => {
+
   try {
+
     const orderStatus = await prisma.Order_Status.update({
       where: {
-        id: +orderStatusId,
+        id: +id,
       },
+      data: {
+        status
+      }
     })
 
     if (!orderStatus) {
-      throw new Error(`No Order_Status with id ${orderStatusId} found`)
+      throw new CustomAPIError("Order Status Id not found", 400);
     }
 
     return orderStatus

@@ -25,13 +25,11 @@ const getAllOrderStatus = async (req, res) => {
 const updateOrderStatus = async (req, res) => {
   try {
 
-    const {orderStatusId} = req.params
+    const { status } = req.body
+    const { id } = req.params
 
-    const {status} = req.body 
-
-    const updatedOrderStatus = await orderServices.update(
-      orderStatusId,
-      status
+    const updatedOrderStatus = await orderStatusServices.updateOrderStatus(
+      status, id
     )
 
     res.status(200).json({

@@ -8,11 +8,6 @@ const findAllOrders = async (params) => {
   const filterOptions = {
     where: {},
     include: {
-      // cart: {
-      //   include: {
-      //     user_id: true
-      //   }
-      // },
       cart: true,
       address: true,
       order_status: true,
@@ -61,7 +56,7 @@ const findOneOrder = async (params) => {
 }
 
 
-const createOrder = async (address_user, address_warehouse, cart_id) => {
+const createOrder = async (cart_id) => {
   try {
 
     // find cart product
@@ -98,20 +93,32 @@ const createOrder = async (address_user, address_warehouse, cart_id) => {
       return total + itemPrice * quantity;
     }, 0);
 
+    const cart = await prisma.Cart.findUnique({
+      where: {
+        id: cart_id
+      }
+    })
+
+    const user = cart.user_id
+
     // find detail user address
     const userAddress = await prisma.address.findUnique({
       where: {
-        id: address_user,
+        user_id: user,
       },
       include: {
         city: true,
       },
     });
 
+    const userAddressId = userAddress.id
+
+    const warehouse = products.warehouse_id
+
     // find detail warehouse address
     const warehouseAddress = await prisma.address.findUnique({
       where: {
-        id: address_warehouse,
+        id: warehouse,
       },
       include: {
         city: true,
@@ -155,26 +162,12 @@ const createOrder = async (address_user, address_warehouse, cart_id) => {
     const newOrder = await prisma.order.create({
       data: {
         cart_id: +cart_id,
-        address_id: +address_user,
+        address_id: +userAddressId,
         shipping_price: +shippingCost,
         price: +totalProductPrice,
-        
         order_status: {
           create: {
             status: 'Pending',
-          },
-        },
-        
-        payment: {
-          create: {
-            payment_method: {
-              connect: {
-                // ID metode pembayaran default
-                id: 1,
-              },
-            },
-            total_price: +totalPrice,
-            cart_id: +cart_id
           },
         },
       },
@@ -192,7 +185,7 @@ const createOrder = async (address_user, address_warehouse, cart_id) => {
     })
 
     if(newOrder) {
-
+      
     }
 
     return newOrder

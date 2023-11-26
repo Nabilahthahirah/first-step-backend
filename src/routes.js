@@ -7,7 +7,6 @@ const router = require("express").Router()
 const orderRoute= require("./api/routes/order.route")
 const orderStatusRoute= require("./api/routes/order-status.route")
 // const { verifyTokenAdmin } = require("../src/api/middlewares/verifyTokenMiddleware")
-const getShippingCost = require("./api/controllers/shipping.controller")
 
 // api routes
 // router.use("/api/category", crudCategory)

@@ -2,14 +2,6 @@ const { order } = require('../../lib/prisma')
 const CustomAPIError = require('../middlewares/custom-error')
 const orderServices = require('../services/order.service')
 
-const totalWeight = () => {
-  
-}
-
-const totalPrice = () => {
-
-}
-
 const getAllOrders = async (req, res) => {
   try {
 
@@ -49,9 +41,9 @@ const getOneOrder = async (req, res) => {
 const createOrder = async (req, res) => {
   try {
 
-    const { address_user, address_warehouse, cart_id } = req.body
+    const { cart_id } = req.body
 
-    const orders = await orderServices.createOrder(address_user, address_warehouse, cart_id)
+    const orders = await orderServices.createOrder(cart_id)
     
     if (!orders) {
       throw new CustomAPIError(`No Order with id ${req.params.id}`, 400)
