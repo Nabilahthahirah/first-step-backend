@@ -63,8 +63,8 @@ const findOneOrder = async (params) => {
 
 const createOrder = async (address_user, address_warehouse, cart_id) => {
   try {
-    // const { cart_id, address_id, shipping_price, price } = params
 
+    // find cart product
     const cartProducts = await prisma.Cart_Product.findMany({
       where: {
         cart_id: +cart_id,
@@ -78,16 +78,27 @@ const createOrder = async (address_user, address_warehouse, cart_id) => {
       }
     });
 
-    const totalWeight = cartProducts.reduce((total, cartProduct) => {
-      const itemWeight = cartProduct.product.product_detail.weight || 0;
-      return total + cartProduct.quantity * itemWeight;
+    const products = cartProducts[0].product
+
+    const productDetails = products.product_detail
+  
+    const productQuantities = cartProducts.map((p) => p.quantity);
+
+    // total weight from items
+    const totalWeight = productDetails.reduce((total, productDetail, index) => {
+      const itemWeight = productDetail.weight || 0;
+      const quantity = productQuantities[index] || 0;
+      return total + itemWeight * quantity;
+    }, 0);
+      
+    // total price from items
+    const totalProductPrice = productDetails.reduce((total, productDetail, index) => {
+      const itemPrice = productDetail.price || 0;
+      const quantity = productQuantities[index] || 0;
+      return total + itemPrice * quantity;
     }, 0);
 
-    const totalProductPrice = cartProducts.reduce((total, cartProduct) => {
-      const itemPrice = cartProduct.product.price || 0;
-      return total + cartProduct.quantity * itemPrice;
-    }, 0);
-
+    // find detail user address
     const userAddress = await prisma.address.findUnique({
       where: {
         id: address_user,
@@ -97,6 +108,7 @@ const createOrder = async (address_user, address_warehouse, cart_id) => {
       },
     });
 
+    // find detail warehouse address
     const warehouseAddress = await prisma.address.findUnique({
       where: {
         id: address_warehouse,
@@ -122,18 +134,28 @@ const createOrder = async (address_user, address_warehouse, cart_id) => {
       },
     }
 
-    const response = await axios.post(`https://api.rajaongkir.com/starter/cost`, qs.stringify(data), options)
+    const response = await axios.post('https://api.rajaongkir.com/starter/cost', qs.stringify(data), options)
 
-    // Ambil ongkos kirim dari response
+    // Log the response from RajaOngkir API
+    console.log('RajaOngkir API Response:', response.data);
+
+    // Check if the response indicates an error
+    if (response.data.rajaongkir.status.code !== 200) {
+      console.log('RajaOngkir API Error Message:', response.data.rajaongkir.message);
+      throw new Error(`RajaOngkir API Error: ${response.data.rajaongkir.message}`);
+    }
+
+    // shipping fee from rajaongkir
     const shippingCost = response.data.rajaongkir.results[0].costs[0].cost[0].value;
 
+    // total payment
     const totalPrice = totalProductPrice + shippingCost
 
-    // Membuat pesanan baru dalam database
+    // create order in database
     const newOrder = await prisma.order.create({
       data: {
         cart_id: +cart_id,
-        address_id: +address_id,
+        address_id: +address_user,
         shipping_price: +shippingCost,
         price: +totalProductPrice,
         
@@ -152,13 +174,14 @@ const createOrder = async (address_user, address_warehouse, cart_id) => {
               },
             },
             total_price: +totalPrice,
+            cart_id: +cart_id
           },
         },
       },
       include: {
         cart: {
           include: {
-            user_id: true,
+            user: true,
             cart_product: true
           }
         },
@@ -167,6 +190,10 @@ const createOrder = async (address_user, address_warehouse, cart_id) => {
         payment: true,
       },
     })
+
+    if(newOrder) {
+
+    }
 
     return newOrder
   } catch (error) {

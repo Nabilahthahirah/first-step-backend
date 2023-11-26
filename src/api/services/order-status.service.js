@@ -3,7 +3,7 @@ const CustomAPIError = require("../middlewares/custom-error")
 
 const findAllOrderStatuses = async () => {
   try {
-    const orderStatuses = await prisma.orderStatus.findMany()
+    const orderStatuses = await prisma.Order_Status.findMany()
     return orderStatuses
   } catch (error) {
     throw error
@@ -12,7 +12,7 @@ const findAllOrderStatuses = async () => {
 
 const updateOrderStatus = async (orderStatusId) => {
   try {
-    const orderStatus = await prisma.orderStatus.update({
+    const orderStatus = await prisma.Order_Status.update({
       where: {
         id: +orderStatusId,
       },
@@ -29,7 +29,7 @@ const updateOrderStatus = async (orderStatusId) => {
 }
 
 module.exports = {
-  findOneOrderStatus,
+  findAllOrderStatuses,
   updateOrderStatus,
 }
 

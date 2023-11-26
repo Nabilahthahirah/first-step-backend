@@ -5,6 +5,7 @@ const router = require("express").Router()
 // const adminRoute = require("./api/routes/admin.route")
 // const crudPaymentMethod = require("./api/routes/payment-method.route")
 const orderRoute= require("./api/routes/order.route")
+const orderStatusRoute= require("./api/routes/order-status.route")
 // const { verifyTokenAdmin } = require("../src/api/middlewares/verifyTokenMiddleware")
 const getShippingCost = require("./api/controllers/shipping.controller")
 
@@ -14,7 +15,7 @@ const getShippingCost = require("./api/controllers/shipping.controller")
 // router.use("/api/products", crudProduct)
 // router.use("/api/paymentmethod", crudPaymentMethod)
 // router.use("/api/user", crudUser)
+router.use("/api/order-status", orderStatusRoute)
 router.use("/api/order", orderRoute)
-router.use("/cost", getShippingCost)
 
 module.exports = router

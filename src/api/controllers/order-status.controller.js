@@ -1,6 +1,7 @@
 const orderStatusServices = require('../services/order-status.service')
+const CustomAPIError = require('../middlewares/custom-error')
 
-const getAllOrders = async (req, res) => {
+const getAllOrderStatus = async (req, res) => {
   try {
 
     const orders = await orderStatusServices.findAllOrderStatuses()
@@ -45,5 +46,6 @@ const updateOrderStatus = async (req, res) => {
 }
 
 module.exports = {
-  getAllOrders
+  getAllOrderStatus,
+  updateOrderStatus
 }
