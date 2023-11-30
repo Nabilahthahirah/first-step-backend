@@ -56,7 +56,7 @@ const findOneOrder = async (params) => {
 }
 
 
-const createOrder = async (cart_id) => {
+const createOrder = async (cart_id, userAddress) => {
   try {
 
     // find cart product
@@ -93,25 +93,17 @@ const createOrder = async (cart_id) => {
       return total + itemPrice * quantity;
     }, 0);
 
-    const cart = await prisma.Cart.findUnique({
-      where: {
-        id: cart_id
-      }
-    })
-
-    const user = cart.user_id
-
     // find detail user address
     const userAddress = await prisma.address.findUnique({
       where: {
-        user_id: user,
+        user_id: userAddress,
       },
       include: {
         city: true,
       },
     });
 
-    const userAddressId = userAddress.id
+    const userAddressId = userAddress
 
     const warehouse = products.warehouse_id
 

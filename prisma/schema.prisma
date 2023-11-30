@@ -36,7 +36,6 @@ model Address {
   order         Order[]
   city          City     @relation(fields: [city_id], references: [id])
   province      Province @relation(fields: [province_id], references: [id])
-  warehouse     Warehouse[]
 }
 
 model City {
@@ -47,6 +46,7 @@ model City {
   updated_at DateTime @default(now())
   province   Province @relation(fields: [province_id], references: [id])
   address    Address[]
+  warehouse  Warehouse[]
 }
 
 model Province {
@@ -56,6 +56,7 @@ model Province {
   updated_at DateTime @default(now())
   City       City[]
   address    Address[]
+  warehouse  Warehouse[]
 }
 
 model Cart {
@@ -119,12 +120,15 @@ model Warehouse {
   id              Int      @id @default(autoincrement())
   admin_id        Int
   warehouse_name  String
-  address_id      Int
+  address         String
+  province_id     Int
+  city_id         Int
   created_at      DateTime @default(now())
   updated_at      DateTime @default(now())
   product         Product[]
   admin           Admin    @relation(fields: [admin_id], references: [id])
-  address         Address  @relation(fields: [address_id], references: [id])
+  province        Province  @relation(fields: [province_id], references: [id])
+  city            City  @relation(fields: [city_id], references: [id])
 }
 
 model Admin {

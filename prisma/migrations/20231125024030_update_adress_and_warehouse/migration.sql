@@ -28,8 +28,9 @@ ALTER TABLE "Address" DROP COLUMN "city",
 ADD COLUMN "city_id" INTEGER NOT NULL;
 
 -- Change the column in table warehouse name from address to address_id
-ALTER TABLE "Warehouse" DROP COLUMN "address",
-ADD COLUMN "address_id" INTEGER NOT NULL;
+ALTER TABLE "Warehouse"
+ADD COLUMN "province_id" INTEGER NOT NULL,
+ADD COLUMN "city_id" INTEGER NOT NULL;
 
 -- AddForeignKey
 ALTER TABLE "Address" ADD CONSTRAINT "Address_city_id_fkey" FOREIGN KEY ("city_id") REFERENCES "City"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -38,7 +39,10 @@ ALTER TABLE "Address" ADD CONSTRAINT "Address_city_id_fkey" FOREIGN KEY ("city_i
 ALTER TABLE "Address" ADD CONSTRAINT "Address_province_id_fkey" FOREIGN KEY ("province_id") REFERENCES "Province"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Warehouse" ADD CONSTRAINT "Warehouse_address_id_fkey" FOREIGN KEY ("address_id") REFERENCES "Address"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Warehouse" ADD CONSTRAINT "Warehouse_province_id_fkey" FOREIGN KEY ("province_id") REFERENCES "Province"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Warehouse" ADD CONSTRAINT "Warehouse_city_id_fkey" FOREIGN KEY ("city_id") REFERENCES "City"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "City" ADD CONSTRAINT "City_province_id_fkey" FOREIGN KEY ("province_id") REFERENCES "Province"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
