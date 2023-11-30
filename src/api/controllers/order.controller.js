@@ -41,7 +41,7 @@ const getOneOrder = async (req, res) => {
 const createOrder = async (req, res) => {
   try {
 
-    const { cart_id } = req.body
+    const { cart_id, userAddress } = req.body
 
     const orders = await orderServices.createOrder(cart_id)
     
