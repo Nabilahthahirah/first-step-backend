@@ -2,7 +2,6 @@ const prisma = require("../../lib/prisma");
 const CustomAPIError = require("../middlewares/custom-error");
 
 const findAll = async (params) => {
-  //Solved
   const filterOptions = {
     where: {},
     include: {
@@ -15,7 +14,7 @@ const findAll = async (params) => {
   const { name } = params;
 
   if (name) {
-    filterOptions.where.name = {
+    filterOptions.where.category_name = {
       contains: name,
       mode: "insensitive",
     };
@@ -25,7 +24,8 @@ const findAll = async (params) => {
   return categories;
 };
 
-const findOne = async (params) => { //Solved
+const findOne = async (params) => {
+  //Solved
   try {
     const { id } = params;
     const categories = prisma.category.findUnique({
@@ -48,7 +48,8 @@ const findOne = async (params) => { //Solved
   }
 };
 
-const create = async (params) => { //Solved
+const create = async (params) => {
+  //Solved
   try {
     const { category_name } = params;
     const categories = await prisma.category.create({
@@ -64,50 +65,48 @@ const create = async (params) => { //Solved
 };
 
 const update = async (pathParams, params) => {
-    try {
-        const { id } = pathParams;
-        const { category_name } = params;
+  try {
+    const { id } = pathParams;
+    const { category_name } = params;
 
-        if (!id || !category_name) {
-            throw new CustomAPIError("Please provide all of the required fields", 400);
-        }
-
-        const updatedCategory = await prisma.category.update({
-            where: {
-                id: +id,
-            },
-            data: {
-                category_name: category_name,
-                updated_at: new Date(),
-            },
-        });
-        return updatedCategory;
-    } catch (error) {
-        console.log(error);
-        throw new CustomAPIError(`${error.message}`, error.statusCode || 500);
+    if (!id || !category_name) {
+      throw new CustomAPIError("Please provide all of the required fields", 400);
     }
+
+    const updatedCategory = await prisma.category.update({
+      where: {
+        id: +id,
+      },
+      data: {
+        category_name: category_name,
+      },
+    });
+    return updatedCategory;
+  } catch (error) {
+    console.log(error);
+    throw new CustomAPIError(`${error.message}`, error.statusCode || 500);
+  }
 };
 
 const destroy = async (params) => {
-    try {
-        const { id } = params;
-        const categories = await prisma.category.delete({
-            where: {
-                id: +id,
-            },
-        });
-        return categories;
-    } catch (error) {
-        console.log(error);
-        throw new CustomAPIError(`Error: ${error.message}`, 500);
-    }
+  try {
+    const { id } = params;
+    const categories = prisma.category.delete({
+      where: {
+        id: +id,
+      },
+    });
+    return categories;
+  } catch (error) {
+    console.log(error);
+    throw new CustomAPIError(`Error: ${error.message}`, 500);
+  }
 };
 
-
 module.exports = {
-    findAll,
-    findOne,
-    create,
-    update,
-    destroy
+  findAll,
+  findOne,
+  create,
+  update,
+  destroy,
 };

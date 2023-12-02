@@ -106,13 +106,13 @@ model Category {
 
 model Warehouse {
   id              Int      @id @default(autoincrement())
-  admin_id        Int 
+  admin_id        Int? 
   warehouse_name  String 
   address         String 
   created_at    DateTime      @default(now())
   updated_at    DateTime      @default(now())
   product         Product[] 
-  admin           Admin   @relation(fields: [admin_id], references: [id])  
+  admin           Admin?   @relation(fields: [admin_id], references: [id])  
 }
 
 model Admin {

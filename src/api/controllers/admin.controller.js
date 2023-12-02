@@ -1,14 +1,12 @@
 const { loginAdmin, postAdmin, putAdmin, destroyAdmin } = require("../services/admin.service");
 
 const login = async (req, res) => {
-  const { username, password } = req.body;
-
-  try {
-    const token = await loginAdmin(username, password);
-    res.status(200).json({ token });
-  } catch (error) {
-    res.status(401).json({ error: error.message });
-  }
+  const result = await loginAdmin(req.body);
+  return res.json({
+    status: "success",
+    message: "Admin credential matched! Here is your token",
+    data: result,
+  });
 };
 
 const createAdmin = async (req, res) => {

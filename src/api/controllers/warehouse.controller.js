@@ -26,10 +26,10 @@ const newWarehouse = async (req, res) => {
 
 const updateWarehouse = async (req, res) => {
   try {
-    const warehouse = await warehouseServices.update(req.body);
+    const warehouses = await warehouseServices.update(req.params, req.body);
     res.status(200).json({
       message: "Update Warehouse Succesfully",
-      data:warehouse,
+      data: warehouses,
     });
   } catch (error) {
     throw error;
@@ -38,13 +38,14 @@ const updateWarehouse = async (req, res) => {
 
 const deleteWarehouse = async (req, res) => {
   try {
-    const warehouse = await warehouseServices.destroy(req.body);
+    const warehouse = await warehouseServices.destroy(req.params);
     res.status(200).json({
+      status: "success",
       message: "Delete Warehouse Succesfully",
       data: warehouse,
     });
   } catch (error) {
-    throw error;
+    throw new CustomAPIError(`Error: ${error.message}`, 500);
   }
 };
 

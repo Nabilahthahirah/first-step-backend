@@ -71,112 +71,92 @@ const postUser = async (data) => {
 };
 
 const getUser = async (data) => {
-    const { username, password } = data;
-    if (!username) {
-      throw new CustomAPIError("Invalid username or password", 401);
-    }
-    if (!password) {
-      throw new CustomAPIError("Invalid username or password", 401);
-    }
-    // Step 1: Check if the username exists
-    const user = await prisma.user.findUnique({
-      where: {
-        username,
-      },
-    });
-  
-    if (!user) {
-      throw new CustomAPIError("Invalid username or password", 401);
-    }
-  
-    // Step 2: Compare passwords
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-  
-    if (!isPasswordValid) {
-      throw new CustomAPIError("Invalid username or password", 401);
-    }
-  
-    // Generate JWT token
-    const token = generateToken(user);
-  
-    return token;
+  const { username, password } = data;
+  if (!username) {
+    throw new CustomAPIError("Invalid username or password", 401);
+  }
+  if (!password) {
+    throw new CustomAPIError("Invalid username or password", 401);
+  }
+  // Step 1: Check if the username exists
+  const user = await prisma.user.findUnique({
+    where: {
+      username,
+    },
+  });
+
+  if (!user) {
+    throw new CustomAPIError("Invalid username or password", 401);
+  }
+
+  // Step 2: Compare passwords
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordValid) {
+    throw new CustomAPIError("Invalid username or password", 401);
+  }
+
+  // Generate JWT token
+  const token = generateToken(user);
+
+  return token;
 };
 
 const putUser = async (pathParams, params) => {
-    try {
-        const { id } = pathParams;
-    
-        const user = await prisma.user.findUnique({
-            where: { id: +id },
-        });
+  try {
+    const { id } = pathParams;
 
-        console.log(user);
-        if (!user) {
-            throw new CustomAPIError(`no user with id of ${id}`, 400);
-        }
-    
-        const {
-            username,
-            email,
-            password,
-            phone,
-        } = params;
-        console.log(params);
-        if (password) {
-            var hashedPassword = await bcrypt.hash(password, 10);
-        }
-        await prisma.user.update({
-            where: {
-            id: +id,
-            },
-            data: {
-            username: username || user.username,
-            email: email || user.email,
-            password: hashedPassword || user.password,
-            phone: phone || user.phone,
-            },
-        });
-    
-        const updateUser = await prisma.user.findUnique({
-            where: { id: +id },
-        });
-        return updateUser;
-    } catch (error) {
-        console.log(error);
-        throw new CustomAPIError(`Error: ${error.message}`, 500);
+    const user = await prisma.user.findUnique({
+      where: { id: +id },
+    });
+
+    console.log(user);
+    if (!user) {
+      throw new CustomAPIError(`no user with id of ${id}`, 400);
     }
+
+    const { username, email, password, phone } = params;
+    console.log(params);
+    if (password) {
+      var hashedPassword = await bcrypt.hash(password, 10);
+    }
+    await prisma.user.update({
+      where: {
+        id: +id,
+      },
+      data: {
+        username: username || user.username,
+        email: email || user.email,
+        password: hashedPassword || user.password,
+        phone: phone || user.phone,
+      },
+    });
+
+    const updateUser = await prisma.user.findUnique({
+      where: { id: +id },
+    });
+    return updateUser;
+  } catch (error) {
+    console.log(error);
+    throw new CustomAPIError(`Error: ${error.message}`, 500);
+  }
 };
 
 const destroyUser = async (params) => {
-    // console.log(params);
-    try {
-        const { id } = params;
-    
-        const user = await prisma.user.findUnique({
-            where: { id: +id },
-        });
-    
-        if (!user) {
-            throw new CustomAPIError(`No user with id ${id}`, 400);
-        }
-    
-        await prisma.user.delete({
-            where: {
-            id: +id,
-            },
-            include: { address: true, cart:true },
-        });
-    
-        return {
-            deletedUser: user,
-        };
-        } catch (error) {
-        console.log(error);
-        throw new CustomAPIError(
-            `Error: ${error.message}`,
-            error.statusCode || 500
-        );
-    }
+  try {
+    const { id } = params;
+    const user = await prisma.user.delete({
+      where: {
+        id: +id,
+      },
+      include: { address: true, cart: true },
+    });
+
+    return user;
+  } catch (error) {
+    console.log(error);
+    throw new CustomAPIError(`Error: ${error.message}`, error.statusCode || 500);
+  }
 };
 
 module.exports = {
@@ -185,5 +165,5 @@ module.exports = {
   postUser,
   getUser,
   putUser,
-  destroyUser
+  destroyUser,
 };

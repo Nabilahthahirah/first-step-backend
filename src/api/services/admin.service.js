@@ -3,7 +3,8 @@ const CustomAPIError = require("../middlewares/custom-error");
 const bcrypt = require("bcryptjs");
 const { generateToken } = require("../../lib/jwt");
 
-const loginAdmin = async (username, password) => {
+const loginAdmin = async (payload) => {
+  const { username, password } = payload;
   try {
     const admin = await prisma.admin.findUnique({ where: { username } });
     if (!admin) {
@@ -16,11 +17,14 @@ const loginAdmin = async (username, password) => {
     }
 
     const token = generateToken(admin);
-    console.log(token, "<<<<<token");
+    console.log(token,"<<<<<<<<<<")
     return token;
   } catch (error) {
     console.log(error);
-    throw new CustomAPIError(`Error: ${error.message}`, error.statusCode || 500);
+    throw new CustomAPIError(
+      `Error: ${error.message}`,
+      error.statusCode || 500
+    );
   }
 };
 

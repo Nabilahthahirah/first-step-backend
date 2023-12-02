@@ -7,6 +7,9 @@ const findAll = async (admin_id) => {
       where: {
         admin_id: admin_id,
       },
+      include: {
+        product: true,
+      },
     });
 
     if (!allWarehouse[0]) {
@@ -41,26 +44,24 @@ const create = async (admin_id, params) => {
   }
 };
 
-const update = async (params) => {
+const update = async (pathParams, params) => {
   try {
-    const warehouse = await prisma.warehouse.findUnique({
-      where: { id: +params.id },
-    });
-
-    if (!warehouse) {
-      throw new CustomAPIError("Warehouse with id " + params.id + " not found", 400);
-    }
-
+    const { id } = pathParams;
     const { warehouse_name, address } = params;
 
+    if (!id || !warehouse_name) {
+      throw new CustomAPIError("Please provide all of the required fields", 400);
+    }
+
     const updatedWarehouse = await prisma.warehouse.update({
-      where: { id: +params.id },
+      where: {
+        id: +id,
+      },
       data: {
-        address: address || warehouse.address,
-        warehouse_name: warehouse_name || warehouse.warehouse_name,
+        warehouse_name: warehouse_name,
+        address: address,
       },
     });
-
     return updatedWarehouse;
   } catch (error) {
     throw new CustomAPIError(`Error updating warehouse: ${error.message}`, 500);
@@ -68,25 +69,18 @@ const update = async (params) => {
 };
 
 const destroy = async (params) => {
-  // try {
-    console.log(params.id);
-  const warehouse = await prisma.warehouse.findUnique({
-    where: { id: +params.id },
-  });
-  if (!warehouse) {
-    throw new CustomAPIError("Warehouse with id " + params.id + " not found", 400);
+  try {
+    const { id } = params;
+    const categories = prisma.warehouse.delete({
+      where: {
+        id: +id,
+      },
+    });
+    return categories;
+  } catch (error) {
+    console.log(error);
+    throw new CustomAPIError(`Error: ${error.message}`, 500);
   }
-  await prisma.warehouse.delete({
-    where: {
-      id: +warehouse.id,
-    },
-  });
-  return {
-    deletedAddress: warehouse,
-  };
-  // } catch (error) {
-  //   throw new CustomAPIError(`Error creating category: ${error.message}`, 500);
-  // }
 };
 
 module.exports = {
