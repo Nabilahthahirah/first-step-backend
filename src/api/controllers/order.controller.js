@@ -41,9 +41,9 @@ const getOneOrder = async (req, res) => {
 const createOrder = async (req, res) => {
   try {
 
-    const { cart_id, userAddress } = req.body
+    const { cart_id, shippingCost } = req.body
 
-    const orders = await orderServices.createOrder(cart_id)
+    const orders = await orderServices.createOrder(cart_id, shippingCost)
     
     if (!orders) {
       throw new CustomAPIError(`No Order with id ${req.params.id}`, 400)

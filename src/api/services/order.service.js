@@ -56,7 +56,7 @@ const findOneOrder = async (params) => {
 }
 
 
-const createOrder = async (cart_id, userAddress) => {
+const createOrder = async (cart_id, shippingCost) => {
   try {
 
     // find cart product
@@ -78,13 +78,6 @@ const createOrder = async (cart_id, userAddress) => {
     const productDetails = products.product_detail
   
     const productQuantities = cartProducts.map((p) => p.quantity);
-
-    // total weight from items
-    const totalWeight = productDetails.reduce((total, productDetail, index) => {
-      const itemWeight = productDetail.weight || 0;
-      const quantity = productQuantities[index] || 0;
-      return total + itemWeight * quantity;
-    }, 0);
       
     // total price from items
     const totalProductPrice = productDetails.reduce((total, productDetail, index) => {
@@ -93,59 +86,26 @@ const createOrder = async (cart_id, userAddress) => {
       return total + itemPrice * quantity;
     }, 0);
 
-    // find detail user address
+    const cart = await prisma.Cart.findUnique({
+      where: {
+        id: +cart_id,
+      }
+    }) 
+
+    const user = cart.user_id
+
     const userAddress = await prisma.address.findUnique({
       where: {
-        user_id: userAddress,
+        user_id: user,
       },
       include: {
         city: true,
       },
     });
 
-    const userAddressId = userAddress
+    const userAddressId = userAddress.id
 
-    const warehouse = products.warehouse_id
-
-    // find detail warehouse address
-    const warehouseAddress = await prisma.address.findUnique({
-      where: {
-        id: warehouse,
-      },
-      include: {
-        city: true,
-      },
-    });
-
-    const apiRajaOngkir = process.env.RAJA_ONGKIR
-
-    const data = {
-      origin: warehouseAddress.city_id,
-      destination: userAddress.city_id,
-      weight: totalWeight,
-      courier: 'jne',
-    }
-
-    const options = {
-      headers: {
-        key: apiRajaOngkir,
-        'content-type': 'application/x-www-form-urlencoded',
-      },
-    }
-
-    const response = await axios.post('https://api.rajaongkir.com/starter/cost', qs.stringify(data), options)
-
-    // Log the response from RajaOngkir API
-    console.log('RajaOngkir API Response:', response.data);
-
-    // Check if the response indicates an error
-    if (response.data.rajaongkir.status.code !== 200) {
-      console.log('RajaOngkir API Error Message:', response.data.rajaongkir.message);
-      throw new Error(`RajaOngkir API Error: ${response.data.rajaongkir.message}`);
-    }
-
-    // shipping fee from rajaongkir
-    const shippingCost = response.data.rajaongkir.results[0].costs[0].cost[0].value;
+    console.log(`Product Price : ${totalProductPrice}`)
 
     // total payment
     const totalPrice = totalProductPrice + shippingCost
@@ -156,7 +116,7 @@ const createOrder = async (cart_id, userAddress) => {
         cart_id: +cart_id,
         address_id: +userAddressId,
         shipping_price: +shippingCost,
-        price: +totalProductPrice,
+        price: +totalPrice,
         order_status: {
           create: {
             status: 'Pending',
@@ -186,40 +146,6 @@ const createOrder = async (cart_id, userAddress) => {
     throw new CustomAPIError(`${error.message}`, error.statusCode || 500)
   }
 }
-
-// const updateOrder = async (orderId, params) => {
-//   try {
-//     const { cart_id, address_id, shipping_price, price, status } = params
-
-//     const updatedOrder = await prisma.order.update({
-//       where: {
-//         id: +orderId,
-//       },
-//       data: {
-//         cart_id: +cart_id,
-//         address_id: +address_id,
-//         shipping_price: +shipping_price,
-//         price: +price,
-//         order_status: {
-//           update: {
-//             status: status || undefined, 
-//           },
-//         },
-//       },
-//       include: {
-//         cart: true,
-//         address: true,
-//         order_status: true,
-//         payment: true,
-//       },
-//     })
-
-//     return updatedOrder
-//   } catch (error) {
-//     console.log(error)
-//     throw new CustomAPIError(`${error.message}`, error.statusCode || 500)
-//   }
-// }
 
 const destroyOrder = async (params) => {
   try {
