@@ -14,6 +14,7 @@ const rajaOngkir = require("./api/routes/rajaOngkir.route");
 const crudWarehouse = require("./api/routes/warehouse.route");
 const crudPayment = require("./api/routes/payment.route");
 const crudUpload = require("./api/routes/upload.route");
+const sendEmail = require("./api/routes/email.route");
 
 // api routes
 router.use("/api/category", crudCategory);
@@ -28,5 +29,6 @@ router.use("/api/rajaongkir", rajaOngkir);
 router.use("/api/warehouse", crudWarehouse);
 router.use("/api/payment", crudPayment);
 router.use("/api/upload", crudUpload);
+router.use("/api/sendEmail", sendEmail);
 
 module.exports = router;
