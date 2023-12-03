@@ -1,9 +1,0 @@
-.loading {
-  width:100px;
-  height:100px;
-  border-radius:50%;
-  border:16px solid;
-  border-color:#ffc639 #222831;
-  animation:load 1s infinite;
-}
-@keyframes load {to{transform: rotate(.5turn)}}
