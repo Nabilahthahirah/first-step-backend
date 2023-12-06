@@ -4,7 +4,7 @@ const axios = require('axios')
 const qs = require('qs')
 require('dotenv').config()
 
-const fetchShipping = async (cart_id) => {
+const fetchShipping = async (cart_id, courier) => {
   try {
     // find cart product
     const cartProducts = await prisma.Cart_Product.findMany({
@@ -42,7 +42,7 @@ const fetchShipping = async (cart_id) => {
 
     const user = cart.user_id
 
-    const userAddress = await prisma.address.findUnique({
+    const userAddress = await prisma.address.findFirst({
       where: {
         user_id: user,
       },
@@ -71,7 +71,7 @@ const fetchShipping = async (cart_id) => {
       origin: warehouseAddress.city_id,
       destination: userAddress.city_id,
       weight: totalWeight,
-      courier: 'jne',
+      courier,
     }
 
     const options = {

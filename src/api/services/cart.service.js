@@ -6,7 +6,13 @@ const getCartByUserId = async (user_id) => {
     where: { user_id: user_id },
     include: {
       cart_product: {
-        include: { product: true },
+        include: { 
+          product: {
+            include: {
+              product_detail: true
+            }
+          } 
+        },
         orderBy: {
           id: "asc", // Order by CartProduct id in ascending order
         },

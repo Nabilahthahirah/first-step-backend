@@ -6,9 +6,11 @@ const getShipping = async(req, res) => {
 
   const {cart_id} = req.params
 
+  const {courier} = req.query
+
   try {
 
-    const cost = await shippingServices.fetchShipping(cart_id)
+    const cost = await shippingServices.fetchShipping(cart_id, courier)
   
     res.status(200).json({
         status: "success",

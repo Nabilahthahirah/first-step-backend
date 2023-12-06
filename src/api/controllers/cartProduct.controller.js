@@ -1,8 +1,10 @@
 const { update, deleteQuantity, createCartProduct } = require("../services/cart_product.service");
 
 const updateQuantity = async (req, res) => {
+  const { id } = req.params;
+  const { quantity } = req.body;
   try {
-    const updatedRecord = await update(req.params, req.body);
+    const updatedRecord = await update(quantity, id);
     res.status(200).json({
         message: "Update Quantity Succesfully",
         data: updatedRecord,
@@ -28,10 +30,10 @@ const deletedQuantity = async (req, res) => {
 async function createdCartProduct(req, res) {
     const userId = req.user.id;
   
-    const { product_id, quantity } = req.body;
+    const { product_id, quantity, price } = req.body;
   
     try {
-      const createdCartProduct = await createCartProduct(userId, product_id, quantity);
+      const createdCartProduct = await createCartProduct(userId, product_id, quantity, price);
       
       res.status(201).json({
         message: "Cart product created successfully",

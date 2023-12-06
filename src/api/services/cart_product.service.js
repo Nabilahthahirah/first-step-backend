@@ -1,9 +1,8 @@
 const prisma = require("../../lib/prisma");
 const CustomAPIError = require("../middlewares/custom-error");
 
-const update = async (pathParams, params) => {
-  const { id } = pathParams;
-  const { quantity } = params;
+const update = async (quantity, id) => {
+  
   const existingRecord = await prisma.cart_Product.findUnique({
     where: {
       id: parseInt(id),
@@ -42,7 +41,7 @@ const deleteQuantity = async (pathParams) => {
     return data;
 };
 
-const createCartProduct = async (authUserId, product_id, quantity) => {
+const createCartProduct = async (authUserId, product_id, quantity, price) => {
     try {
       // Retrieve the cart_id associated with the authenticated user
       const userCart = await prisma.user.findUnique({
@@ -69,6 +68,7 @@ const createCartProduct = async (authUserId, product_id, quantity) => {
           product_id: product_id,
           cart_id: cart_id,
           quantity: quantity,
+          price: price,
         },
       });
   
