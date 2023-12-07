@@ -12,8 +12,8 @@ datasource db {
 
 model User {
   id            Int      @id @default(autoincrement())
-  username      String
-  email         String  
+  username      String  @unique
+  email         String  @unique
   password      String 
   phone         String
   created_at    DateTime      @default(now())
@@ -61,12 +61,23 @@ model Province {
 
 model Cart {
   id            Int      @id @default(autoincrement())
-  user_id       Int
+  user_id       Int   @unique
+  shipping_cost Int?
+  total_payment Int           @default(0)
+  total_weight  Int           @default(0)
+  total_price   Int           @default(0)
+  courier       Courier?
   created_at    DateTime      @default(now())
   updated_at    DateTime      @default(now())
-  user          User     @relation(fields: [user_id], references: [id])
+  user          User     @relation(fields: [user_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
   cart_product  Cart_Product[]
   order         Order[]
+}
+
+enum Courier {
+  jne
+  pos
+  tiki
 }
 
 model Cart_Product {
@@ -74,6 +85,7 @@ model Cart_Product {
   product_id    Int
   cart_id       Int
   quantity      Int
+  price         Int
   created_at    DateTime      @default(now())
   updated_at    DateTime      @default(now())
   cart          Cart     @relation(fields: [cart_id], references: [id])
@@ -91,8 +103,8 @@ model Product {
   updated_at      DateTime      @default(now())
   Cart_Product    Cart_Product[]
   product_detail  Product_Detail[]
-  category        Category  @relation(fields: [category_id], references: [id])
-  warehouse       Warehouse @relation(fields: [warehouse_id], references: [id])
+  category        Category  @relation(fields: [category_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  warehouse       Warehouse @relation(fields: [warehouse_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }
 
 model Product_Detail {
@@ -105,7 +117,7 @@ model Product_Detail {
   weight        Int  
   created_at    DateTime      @default(now())
   updated_at    DateTime      @default(now())
-  product       Product  @relation(fields: [product_id], references: [id])
+  product       Product  @relation(fields: [product_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }
 
 model Category {
@@ -118,7 +130,7 @@ model Category {
 
 model Warehouse {
   id              Int      @id @default(autoincrement())
-  admin_id        Int
+  admin_id        Int?
   warehouse_name  String
   address         String
   province_id     Int
@@ -126,9 +138,10 @@ model Warehouse {
   created_at      DateTime @default(now())
   updated_at      DateTime @default(now())
   product         Product[]
-  admin           Admin    @relation(fields: [admin_id], references: [id])
+  admin           Admin?    @relation(fields: [admin_id], references: [id])
   province        Province  @relation(fields: [province_id], references: [id])
   city            City  @relation(fields: [city_id], references: [id])
+
 }
 
 model Admin {

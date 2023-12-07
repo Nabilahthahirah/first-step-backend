@@ -1,4 +1,4 @@
-const { getCartByUserId, deleteCartProduct, createCartProduct } = require("../services/cart.service");
+const { getCartByUserId, deleteCartProduct, createCartProduct, fetchCart, resetCartToDefault } = require("../services/cart.service");
 const CustomAPIError = require("../middlewares/custom-error");
 
 const showCart = async (req, res) => {
@@ -30,7 +30,7 @@ const deleteCart = async (req, res) => {
   }
 };
 
-async function addToCart(req, res) {
+const addToCart = async (req, res) => {
   try {
     const { product_id, quantity } = req.body;
     const userId = req.user.id; // Mendapatkan user ID dari request
@@ -43,4 +43,13 @@ async function addToCart(req, res) {
   }
 }
 
-module.exports = { showCart, deleteCart, addToCart, deleteCart };
+const resetCart = async (req, res) => {
+  const item = await resetCartToDefault(+req.user.id);
+  return res.json({
+    status: "success",
+    message: "All item on the cart are deleted successfully",
+    data: item,
+  });
+};
+
+module.exports = { showCart, deleteCart, addToCart, deleteCart, resetCart };

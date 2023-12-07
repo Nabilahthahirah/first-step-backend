@@ -23,7 +23,7 @@ const verifyTokenUser = (req, res, next) => {
   }
 };
 
-const verifyTokenAdmin = (req, res, next) => {
+const verifyTokenAdmin = async (req, res, next) => {
   try {
     const token = req.headers.authorization;
 
@@ -35,16 +35,20 @@ const verifyTokenAdmin = (req, res, next) => {
 
     const decodedToken = verifyToken(accessToken);
     const { id, username } = decodedToken;
-    const CheckUser = prisma.admin.findUnique({
+
+    const CheckUser = await prisma.admin.findUnique({
       where: { username: username },
     });
+
     if (!CheckUser) {
       throw new CustomAPIError("Unauthorized", 401);
     }
-    req.user = decodedToken; // Store user information in request object for later use
+
+    req.admin = decodedToken; // Store user information in request object for later use
     next(); // Move to the next middleware or route handler
   } catch (error) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 };
+
 module.exports = { verifyTokenUser, verifyTokenAdmin };
