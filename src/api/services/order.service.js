@@ -55,8 +55,35 @@ const findOneOrder = async (params) => {
   }
 }
 
+const findOneOrderByCart = async (params) => {
+  try {
+    const { id } = params
 
-const createOrder = async (cart_id, shippingCost) => {
+    const order = await prisma.order.findFirst({
+      where: {
+        cart_id: +id,
+      },
+      include: {
+        cart: true,
+        address: true,
+        order_status: true,
+        payment: true,
+      },
+    })
+
+    if (!order) {
+      throw new CustomAPIError(`No Order with id ${id} was found`, 400)
+    }
+
+    return order
+  } catch (error) {
+    console.log(error)
+    throw new CustomAPIError(`Error: ${error.message}`, error.statusCode || 500)
+  }
+}
+
+
+const createOrder = async (cart_id, productPrice, shippingCost) => {
   try {
 
     // find cart product
@@ -80,11 +107,11 @@ const createOrder = async (cart_id, shippingCost) => {
     const productQuantities = cartProducts.map((p) => p.quantity);
       
     // total price from items
-    const totalProductPrice = productDetails.reduce((total, productDetail, index) => {
-      const itemPrice = productDetail.price || 0;
-      const quantity = productQuantities[index] || 0;
-      return total + itemPrice * quantity;
-    }, 0);
+    // const totalProductPrice = productDetails.reduce((total, productDetail, index) => {
+    //   const itemPrice = productDetail.price || 0;
+    //   const quantity = productQuantities[index] || 0;
+    //   return total + itemPrice * quantity;
+    // }, 0);
 
     const cart = await prisma.Cart.findUnique({
       where: {
@@ -94,7 +121,7 @@ const createOrder = async (cart_id, shippingCost) => {
 
     const user = cart.user_id
 
-    const userAddress = await prisma.address.findUnique({
+    const userAddress = await prisma.address.findFirst({
       where: {
         user_id: user,
       },
@@ -105,10 +132,10 @@ const createOrder = async (cart_id, shippingCost) => {
 
     const userAddressId = userAddress.id
 
-    console.log(`Product Price : ${totalProductPrice}`)
+    // console.log(`Product Price : ${totalProductPrice}`)
 
     // total payment
-    const totalPrice = totalProductPrice + shippingCost
+    // const totalPrice = totalProductPrice + shippingCost
 
     // create order in database
     const newOrder = await prisma.order.create({
@@ -116,10 +143,10 @@ const createOrder = async (cart_id, shippingCost) => {
         cart_id: +cart_id,
         address_id: +userAddressId,
         shipping_price: +shippingCost,
-        price: +totalPrice,
+        price: +productPrice,
         order_status: {
           create: {
-            status: 'Pending',
+            status: 'Menunggu Pembayaran',
           },
         },
       },
@@ -174,6 +201,7 @@ const destroyOrder = async (params) => {
 module.exports = {
     findAllOrders,
     findOneOrder,
+    findOneOrderByCart,
     createOrder,
     destroyOrder
 }

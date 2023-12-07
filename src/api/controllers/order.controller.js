@@ -38,12 +38,28 @@ const getOneOrder = async (req, res) => {
   }
 }
 
+const getOneOrderByCart = async (req, res) => {
+  try {
+
+    const orders = await orderServices.findOneOrderByCart(req.params)
+  
+    res.status(200).json({
+        status: "success",
+        message: "Get Orders",
+        data: orders,
+    })
+
+  } catch (error) {
+    throw new CustomAPIError(`Error: ${error.message}`, error.statusCode || 500)
+  }
+}
+
 const createOrder = async (req, res) => {
   try {
 
-    const { cart_id, shippingCost } = req.body
+    const { cart_id, productPrice, shippingCost } = req.body
 
-    const orders = await orderServices.createOrder(cart_id, shippingCost)
+    const orders = await orderServices.createOrder(cart_id, productPrice, shippingCost)
     
     if (!orders) {
       throw new CustomAPIError(`No Order with id ${req.params.id}`, 400)
@@ -78,7 +94,7 @@ const deleteOrder = async (req, res) => {
 module.exports = {
   getAllOrders,
   getOneOrder,
+  getOneOrderByCart,
   createOrder,
-  // updateOrder,
   deleteOrder
 }

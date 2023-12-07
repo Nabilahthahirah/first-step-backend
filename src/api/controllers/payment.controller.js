@@ -34,6 +34,19 @@ const getOnepayments = async (req, res) => {
   }
 };
 
+const getOnepaymentByOrder = async (req, res) => {
+  try {
+    const payments = await paymentServices.findOneByOrder(req.params);
+    res.status(200).json({
+      status: "success",
+      message: "Get Payment",
+      data: payments,
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
 const newPayments = async (req, res) => {
   try {
     const { order_id, payment_method_id, cart_id, total_price } = req.body;
@@ -99,6 +112,7 @@ const deletePayment = async (req, res) => {
 module.exports = {
   getAllpayments,
   getOnepayments,
+  getOnepaymentByOrder,
   newPayments,
   updatePayment,
   deletePayment,

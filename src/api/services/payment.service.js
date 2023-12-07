@@ -33,6 +33,30 @@ const findOne = async (params) => {
   }
 };
 
+const findOneByOrder = async (params) => {
+  try {
+    const { id } = params;
+    const payment = await prisma.payment.findFirst({
+      where: {
+        order_id: +id,
+      },
+      include: { upload: true },
+    });
+
+    if (!payment) {
+      throw new CustomAPIError(`No Payment with id ${id} was found`, 400);
+    }
+
+    return payment;
+  } catch (error) {
+    console.log(error);
+    throw new CustomAPIError(
+      `Error: ${error.message}`,
+      error.statusCode || 500
+    );
+  }
+};
+
 const create = async (params) => {
   try {
     const { order_id, payment_method_id, cart_id, total_price } = params;
@@ -108,6 +132,7 @@ const process = async (params) => {
 module.exports = {
   findAll,
   findOne,
+  findOneByOrder,
   create,
   update,
   destroy,

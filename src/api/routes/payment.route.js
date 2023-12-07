@@ -2,6 +2,7 @@ const controllers = require("../controllers/payment.controller");
 const router = require("express").Router();
 
 router.get("/", controllers.getAllpayments);
+router.get("/order/:id", controllers.getOnepaymentByOrder);
 router.get("/:id", controllers.getOnepayments);
 router.post("/", controllers.newPayments);
 router.put("/:id", controllers.updatePayment);

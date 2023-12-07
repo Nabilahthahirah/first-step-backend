@@ -5,7 +5,7 @@ const getAllpaymentMethods = async (req, res) => { //Solved
   try {
     const paymentMethods = await paymentMethodServices.findAll(req.query);
     if (paymentMethods.length === 0) {
-      throw new CustomAPIError(`No Category was found`, 400);
+      throw new CustomAPIError(`No Payment Method was found`, 400);
     }
     res.status(200).json({
       status: "success",

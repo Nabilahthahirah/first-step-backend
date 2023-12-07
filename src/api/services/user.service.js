@@ -239,6 +239,42 @@ const fetchCity = async(province_id) => {
   }
 }
 
+const fetchProvinceById = async(id) => {
+  try {
+    const province = await prisma.province.findUnique({
+      where: {
+        id: +id
+      }
+    });
+
+    return province;
+  } catch (error) {
+    console.log(error);
+    throw new CustomAPIError(
+      `Error: ${error.message}`,
+      error.statusCode || 500
+    );
+  }
+}
+
+const fetchCityById = async(id) => {
+  try {
+    const city = await prisma.city.findUnique({
+      where: {
+        id: +id
+      }
+    });
+
+    return city;
+  } catch (error) {
+    console.log(error);
+    throw new CustomAPIError(
+      `Error: ${error.message}`,
+      error.statusCode || 500
+    );
+  }
+}
+
 module.exports = {
   fetchAllUsers,
   fetchSingleUsersById,
@@ -247,5 +283,7 @@ module.exports = {
   putUser,
   destroyUser,
   fetchProvince,
-  fetchCity
+  fetchCity,
+  fetchProvinceById,
+  fetchCityById,
 };

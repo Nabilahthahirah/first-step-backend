@@ -32,7 +32,7 @@ const deleteQuantity = async (pathParams) => {
     });
 
     if (!existingRecord) {
-        throw new CustomAPIError("Record not found", 404); // Adjust the error message and status code as needed
+        throw new CustomAPIError("Record not found", 404);
     }
 
     const data = await prisma.cart_Product.delete({

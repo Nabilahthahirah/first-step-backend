@@ -87,6 +87,30 @@ const getCity = async (req, res) => {
   });
 }
 
+const getProvinceById = async (req, res) => {
+  const {id} = req.params
+
+  const province = await userServices.fetchProvinceById(id)
+
+  return res.json({
+    status: "success",
+    message: "Get province successfully",
+    data: province,
+  });
+}
+
+const getCityById = async (req, res) => {
+  const {id} = req.params
+
+  const city = await userServices.fetchCityById(id)
+  
+  return res.json({
+    status: "success",
+    message: "Get city successfully",
+    data: city,
+  });
+}
+
 module.exports = {
   getAllUsers,
   getUserId,
@@ -95,5 +119,7 @@ module.exports = {
   updateUser,
   deleteUser,
   getProvince,
-  getCity
+  getCity,
+  getProvinceById,
+  getCityById,
 };
