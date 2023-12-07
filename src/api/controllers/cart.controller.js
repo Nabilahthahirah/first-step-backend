@@ -2,7 +2,9 @@ const { getCartByUserId, deleteCartProduct, createCartProduct, fetchCart, resetC
 const CustomAPIError = require("../middlewares/custom-error");
 
 const showCart = async (req, res) => {
-  const userCart = await fetchCart(+req.user.id);
+  console.log(req.user.id, "<<< user id");
+
+  const userCart = await getCartByUserId(+req.user.id);
   return res.json({
     status: "success",
     message: "This is the Cart",

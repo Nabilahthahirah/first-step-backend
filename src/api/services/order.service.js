@@ -1,331 +1,180 @@
-const prisma = require("../../lib/prisma");
-const CustomAPIError = require("../middlewares/custom-error");
-const { resetCartToDefault } = require("./cart.service");
+const prisma = require('../../lib/prisma')
+const CustomAPIError = require("../middlewares/custom-error")
+const axios = require('axios')
+const qs = require('qs')
+require('dotenv').config()
 
-const makeOrderFromCart = async (params) => {
-  let {
-    id,
-    address_id,
-    shipping_method,
-    shipping_cost,
-    bank_account_id,
-    courier,
-    product_order_attributes,
-    total_weight,
-    total_price,
-    total_payment,
-    credit_card,
-  } = params;
-
-  if (product_order_attributes.length === 0) {
-    throw new CustomAPIError("No product is provided", 400);
-  }
-
-  try {
-    const order = await prisma.$transaction(async (prisma) => {
-      const createdOrder = await prisma.order.create({
-        data: {
-          user: { connect: { id } },
-          shipping_cost: shipping_cost,
-          total_price: total_price,
-          total_payment: total_payment,
-          total_weight: total_weight,
-          shipping_method: shipping_method,
-          order_date: new Date(),
-          address: { connect: { id: address_id } },
-          bankAccount: { connect: { id: bank_account_id } },
-          courier: courier,
-          status: "waiting",
-          credit_card,
-        },
-        include: { orderProducts: true },
-      });
-
-      await Promise.all(
-        product_order_attributes.map(async (productOrder) => {
-          const { product_details_id, price, quantity } = productOrder;
-
-          await prisma.orderProduct.create({
-            data: {
-              product_details_id,
-              order_id: createdOrder.id,
-              quantity,
-              price,
-            },
-          });
-
-          const prev = await prisma.productDetails.findUnique({
-            where: { id: product_details_id },
-          });
-
-          if (!prev || prev.stock < quantity) {
-            throw new CustomAPIError(`Insufficient stock `, 400);
-          }
-
-          await prisma.productDetails.update({
-            where: { id: product_details_id },
-            data: { stock: prev.stock - quantity },
-          });
-          await prisma.product.update({
-            where: { id: prev.product_id },
-            data: { counter: { increment: quantity } },
-          });
-        })
-      );
-
-      return createdOrder;
-    });
-
-    resetCartToDefault(id);
-    return await prisma.order.findUnique({
-      where: { id: order.id },
-      include: {
-        user: true,
-        orderProducts: {
-          include: {
-            ProductDetails: {
-              include: { product: { include: { productGalleries: true } } },
-            },
-          },
-        },
-        bankAccount: true,
-        address: true,
-      },
-    });
-  } catch (error) {
-    throw new CustomAPIError(`Error: ${error.message}`, 400);
-  }
-};
-
-const fetchAllOrder = async ({
-  id,
-  startTime,
-  endTime,
-  status,
-  page,
-  limit,
-  sortBy,
-  sortOrder,
-  q,
-}) => {
-  const filterObject = {};
-  if (id) {
-    filterObject.id = +id;
-  }
-  if (startTime && endTime) {
-    filterObject.order_date = {
-      gte: new Date(startTime),
-      lte: new Date(endTime),
-    };
-  }
-
-  if (status) {
-    filterObject.status = status;
-  }
-
-  const pageNumber = Number(page) || 1;
-  const take = Number(limit) || 2;
-  const totalItems = await prisma.order.count({
-    where: q
-      ? {
-          OR: [{ id: +q }, {}],
-        }
-      : filterObject,
-  });
-  const totalPages = Math.ceil(totalItems / take);
-
-  const filterSortBy = sortBy || "order_date";
-  const filterSortOrder = sortOrder || "asc";
-
-  const orders = await prisma.order.findMany({
-    where: q
-      ? {
-          OR: [{ id: +q }, {}],
-        }
-      : filterObject,
+const findAllOrders = async (params) => {
+  const filterOptions = {
+    where: {},
     include: {
-      orderProducts: {
-        include: {
-          ProductDetails: {
-            include: { product: { include: { productGalleries: true } } },
-          },
-        },
-      },
-      user: true,
-      bankAccount: true,
-      address: { include: { city: true } },
+      cart: true,
+      address: true,
+      order_status: true,
+      payment: true,
     },
     orderBy: {
-      [filterSortBy]: filterSortOrder, // Dynamic sorting based on the query parameters
+      id: 'asc',
     },
-    skip: (pageNumber - 1) * take,
-    take: take,
-  });
-  if (!totalPages) {
-    return {
-      orders,
-      prevPage: pageNumber - 1 === 0 ? null : pageNumber - 1,
-      currentPage: pageNumber,
-      nextPage: null,
-      limit: take,
-      totalItems,
-      totalPages,
-    };
   }
-  return {
-    orders,
-    prevPage: pageNumber > 1 ? pageNumber - 1 : null,
-    currentPage: pageNumber,
-    nextPage: pageNumber < totalPages ? pageNumber + 1 : null,
-    totalItems,
-    limit: take,
-    totalPages,
-  };
-};
 
-const updatePaymentReceiptInOrder = async (payload) => {
-  const { order_id, payment_receipt, status, review } = payload;
   try {
-    const updatedOrder = await prisma.order.update({
-      where: { id: order_id },
-      data: {
-        payment_receipt: payment_receipt,
-        status: status,
-        review: review || false,
+    const orders = await prisma.order.findMany(filterOptions)
+
+    return orders
+  } catch (error) {
+    console.log('Error fetching orders:', error)
+    throw new CustomAPIError(`${error.message}`, error.statusCode || 500)
+  }
+}
+
+const findOneOrder = async (params) => {
+  try {
+    const { id } = params
+
+    const order = await prisma.order.findUnique({
+      where: {
+        id: +id,
+      },
+      include: {
+        cart: true,
+        address: true,
+        order_status: true,
+        payment: true,
+      },
+    })
+
+    if (!order) {
+      throw new CustomAPIError(`No Order with id ${id} was found`, 400)
+    }
+
+    return order
+  } catch (error) {
+    console.log(error)
+    throw new CustomAPIError(`Error: ${error.message}`, error.statusCode || 500)
+  }
+}
+
+
+const createOrder = async (cart_id, shippingCost) => {
+  try {
+
+    // find cart product
+    const cartProducts = await prisma.Cart_Product.findMany({
+      where: {
+        cart_id: +cart_id,
+      },
+      include: {
+        product: {
+          include: {
+            product_detail: true,
+          },
+        },
+      }
+    });
+
+    const products = cartProducts[0].product
+
+    const productDetails = products.product_detail
+  
+    const productQuantities = cartProducts.map((p) => p.quantity);
+      
+    // total price from items
+    const totalProductPrice = productDetails.reduce((total, productDetail, index) => {
+      const itemPrice = productDetail.price || 0;
+      const quantity = productQuantities[index] || 0;
+      return total + itemPrice * quantity;
+    }, 0);
+
+    const cart = await prisma.Cart.findUnique({
+      where: {
+        id: +cart_id,
+      }
+    }) 
+
+    const user = cart.user_id
+
+    const userAddress = await prisma.address.findUnique({
+      where: {
+        user_id: user,
+      },
+      include: {
+        city: true,
       },
     });
 
-    return updatedOrder;
-  } catch (error) {
-    throw new CustomAPIError(
-      `Error updating payment receipt in order: ${error.message}`,
-      error.statusCode || 500
-    );
-  }
-};
+    const userAddressId = userAddress.id
 
-const updateOrderStatusAndTrackingNumber = async (payload) => {
-  const { id, tracking_number, status } = payload;
-  try {
-    const updatedOrder = await prisma.order.update({
-      where: { id: id },
+    console.log(`Product Price : ${totalProductPrice}`)
+
+    // total payment
+    const totalPrice = totalProductPrice + shippingCost
+
+    // create order in database
+    const newOrder = await prisma.order.create({
       data: {
-        status: status,
-        tracking_number: tracking_number,
+        cart_id: +cart_id,
+        address_id: +userAddressId,
+        shipping_price: +shippingCost,
+        price: +totalPrice,
+        order_status: {
+          create: {
+            status: 'Pending',
+          },
+        },
       },
-    });
+      include: {
+        cart: {
+          include: {
+            user: true,
+            cart_product: true
+          }
+        },
+        address: true,
+        order_status: true,
+        payment: true,
+      },
+    })
 
-    return updatedOrder;
+    if(newOrder) {
+      
+    }
+
+    return newOrder
   } catch (error) {
-    throw new CustomAPIError(
-      `Error updating order status and tracking number: ${error.message}`,
-      error.statusCode || 500
-    );
+    console.log(error)
+    throw new CustomAPIError(`${error.message}`, error.statusCode || 500)
   }
-};
+}
 
-const deleteOrderById = async (orderId) => {
+const destroyOrder = async (params) => {
   try {
-    // Use Prisma to delete the order by its ID
+    
+    const { id } = params
+
     const deletedOrder = await prisma.order.delete({
       where: {
-        id: orderId,
+        id: +id,
       },
-    });
+      include: {
+        cart: true,
+        address: true,
+        order_status: true,
+        payment: true,
+      },
+    })
 
-    return deletedOrder;
+    return deletedOrder
   } catch (error) {
-    // Handle any errors, e.g., order not found
-    throw new Error(`Error deleting order: ${error.message}`);
+    console.log(error)
+    throw new CustomAPIError(`${error.message}`, error.statusCode || 500)
   }
-};
+}
 
-const fetchOrderByUserId = async (
-  userId,
-  { status, page, limit, sortBy, sortOrder }
-) => {
-  const filterObject = {};
-  if (status) {
-    filterObject.status = status;
-  }
-
-  const pageNumber = Number(page) || 1;
-  const take = Number(limit) || 50;
-
-  const totalItems = await prisma.order.count({
-    where: { user_id: +userId, ...filterObject },
-  });
-
-  const totalPages = Math.ceil(totalItems / take); // Use 'take' instead of 'limit'
-
-  const filterSortBy = sortBy || "order_date";
-  const filterSortOrder = sortOrder || "asc";
-
-  const orders = await prisma.order.findMany({
-    where: {
-      user_id: +userId,
-      ...filterObject, // Spread the filterObject here
-    },
-    include: {
-      orderProducts: {
-        include: {
-          ProductDetails: {
-            include: { product: { include: { productGalleries: true } } },
-          },
-        },
-      },
-      user: true,
-      bankAccount: true,
-      address: { include: { city: true } },
-    },
-    orderBy: {
-      [filterSortBy]: filterSortOrder,
-    },
-    skip: (pageNumber - 1) * take,
-    take: take,
-  });
-
-  return {
-    orders,
-    prevPage: pageNumber - 1 > 0 ? pageNumber - 1 : null,
-    currentPage: pageNumber,
-    nextPage: pageNumber + 1 <= totalPages ? pageNumber + 1 : null,
-    totalItems,
-    limit: take, // Use 'take' instead of 'limit'
-    totalPages,
-  };
-};
-
-const fetchOrderbyId = async (order_id) => {
-  const order = await prisma.order.findUnique({
-    where: {
-      id: +order_id,
-    },
-    include: {
-      orderProducts: {
-        include: {
-          ProductDetails: {
-            include: { product: { include: { productGalleries: true } } },
-          },
-        },
-      },
-      bankAccount: true,
-      user: true,
-      address: { include: { city: true } },
-    },
-  });
-  if (!order) {
-    throw new CustomAPIError(`No Order with id ${order_id} was found`, 400);
-  }
-
-  return order;
-};
 module.exports = {
-  makeOrderFromCart,
-  fetchAllOrder,
-  updatePaymentReceiptInOrder,
-  updateOrderStatusAndTrackingNumber,
-  deleteOrderById,
-  fetchOrderByUserId,
-  fetchOrderbyId,
-};
+    findAllOrders,
+    findOneOrder,
+    createOrder,
+    // updateOrder,
+    destroyOrder
+}
