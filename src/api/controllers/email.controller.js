@@ -6,12 +6,12 @@ require("dotenv").config();
 const sendEmail = async (req, res) => {
   console.log(req.body);
   // return
-  const { to_name, from_name, subject, message } = req.body;
+  const { to_name, from_name, subject, message, to_email } = req.body;
   try {
     await emailjs.send(
       process.env.SERVICE_ID_EMAIL,
       process.env.TEMPLATE_ID_EMAIL,
-      {template_params: {to_name, from_name, subject, message}},
+      {to_name, from_name, subject, message, to_email},
       {
         publicKey: process.env.USER_ID_EMAIL,
         privateKey: process.env.TOKEN_EMAIL, // optional, highly recommended for security reasons
