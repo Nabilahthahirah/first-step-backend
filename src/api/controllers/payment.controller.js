@@ -1,5 +1,8 @@
 const CustomAPIError = require("../middlewares/custom-error");
 const paymentServices = require("../services/payment.service");
+
+const uploadMulter = require("../../lib/multer");
+const cloudinary = require("../../lib/cloudinary");
 const midtransClient = require("midtrans-client");
 require("dotenv").config();
 const getAllpayments = async (req, res) => {
@@ -82,7 +85,7 @@ const newPayments = async (req, res) => {
 
 const updatePhoto = async (req, res) => {
   try {
-    upload.single("photo")(req, res, async (err) => {
+    uploadMulter.single("upload")(req, res, async (err) => {
       if (err) {
         return res.status(400).json({ error: err.message });
       }
@@ -95,8 +98,8 @@ const updatePhoto = async (req, res) => {
         if (cloudinaryErr) {
           return res.status(400).json({ error: cloudinaryErr.message });
         }
-        const photo = result.secure_url;
-        req.body.photo = photo;
+        const upload = result.secure_url;
+        req.body.upload = upload;
         const updatedUploads = await paymentServices.uploadPhoto(
           req.params,
           req.body

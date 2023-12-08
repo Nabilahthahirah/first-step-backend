@@ -77,16 +77,27 @@ const create = async (params) => {
 const uploadPhoto = async (pathParams, data) => {
   try {
     const { id } = pathParams;
-    const { photo } = data;
-    const updatePhotos = await prisma.upload.update({
+    const { upload } = data;
+    // console.log("pathParams", pathParams);
+    // console.log("data", data);
+    // console.log("id", id);
+    // console.log("admin_id", admin_id);
+    // console.log("payment_id", payment_id);
+    // if (!id || !admin_id || !payment_id || !photo) {
+    //   throw new CustomAPIError(
+    //     "Please provide all of the required fields",
+    //     400
+    //   );
+    // }
+    const updateUpload = await prisma.payment.update({
       where: {
         id: +id,
       },
       data: {
-        photo: photo,
+        upload: upload,
       },
     });
-    return updatePhotos;
+    return updateUpload;
   } catch (error) {
     console.log(error);
     throw new CustomAPIError(`${error.message}`, error.statusCode || 500);
