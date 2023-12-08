@@ -2,8 +2,7 @@ const prisma = require("../../lib/prisma");
 const CustomAPIError = require("../middlewares/custom-error");
 
 const findAll = async (params) => {
-  const payment = await prisma.payment.findMany({
-  });
+  const payment = await prisma.payment.findMany({});
   return payment;
 };
 
@@ -72,6 +71,25 @@ const create = async (params) => {
   } catch (error) {
     console.log(error);
     throw new CustomAPIError(`Error creating payment: ${error.message}`, 500);
+  }
+};
+
+const uploadPhoto = async (pathParams, data) => {
+  try {
+    const { id } = pathParams;
+    const { upload } = data;
+    const updateUpload = await prisma.payment.update({
+      where: {
+        id: +id,
+      },
+      data: {
+        upload: upload,
+      },
+    });
+    return updateUpload;
+  } catch (error) {
+    console.log(error);
+    throw new CustomAPIError(`${error.message}`, error.statusCode || 500);
   }
 };
 
@@ -144,4 +162,5 @@ module.exports = {
   create,
   update,
   destroy,
+  uploadPhoto,
 };

@@ -1,5 +1,8 @@
 const CustomAPIError = require("../middlewares/custom-error");
 const paymentServices = require("../services/payment.service");
+
+const uploadMulter = require("../../lib/multer");
+const cloudinary = require("../../lib/cloudinary");
 const midtransClient = require("midtrans-client");
 require("dotenv").config();
 const getAllpayments = async (req, res) => {
@@ -61,7 +64,7 @@ const newPayments = async (req, res) => {
         order_id: +order_id,
         gross_amount: +total_price,
       },
-      enabled_payments: payment_method_id,
+      enabled_payments: ["other_qris"],
     };
     snap.createTransaction(parameter).then((transaction) => {
       const dataPayment = {
@@ -75,6 +78,42 @@ const newPayments = async (req, res) => {
   } catch (error) {
     throw new CustomAPIError(
       `Error creating payment: ${error.message}`,
+      error.statusCode || 500
+    );
+  }
+};
+
+const updatePhoto = async (req, res) => {
+  try {
+    uploadMulter.single("upload")(req, res, async (err) => {
+      if (err) {
+        return res.status(400).json({ error: err.message });
+      }
+      const { id } = req.params;
+      const file = req.file;
+      if (!file) {
+        return res.status(400).json({ error: "No image provided" });
+      }
+      cloudinary.uploader.upload(file.path, async (cloudinaryErr, result) => {
+        if (cloudinaryErr) {
+          return res.status(400).json({ error: cloudinaryErr.message });
+        }
+        const upload = result.secure_url;
+        req.body.upload = upload;
+        const updatedUploads = await paymentServices.uploadPhoto(
+          req.params,
+          req.body
+        );
+        res.status(200).json({
+          status: "success",
+          message: "Update Upload Succesfully",
+          data: updatedUploads,
+        });
+      });
+    });
+  } catch (error) {
+    throw new CustomAPIError(
+      `Error creating upload: ${error.message}`,
       error.statusCode || 500
     );
   }
@@ -116,4 +155,5 @@ module.exports = {
   newPayments,
   updatePayment,
   deletePayment,
+  updatePhoto,
 };

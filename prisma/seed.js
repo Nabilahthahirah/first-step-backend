@@ -5,7 +5,7 @@ async function seed() {
   // Seed untuk Admin
   const admin = await prisma.admin.create({
     data: {
-      username: "hennndika",
+      username: "inibudi",
       email: "sukiem@example.com",
       password: "sukiem",
       address: "jalan sukiem",
@@ -181,7 +181,8 @@ async function seed() {
   const productDetail1 = await prisma.product_Detail.create({
     data: {
       product_id: product1.id,
-      photo: "https://res.cloudinary.com/dyua08mya/image/upload/v1701670086/ynwygof3appusaddu2ee.jpg",
+      photo:
+        "https://res.cloudinary.com/dyua08mya/image/upload/v1701670086/ynwygof3appusaddu2ee.jpg",
       color: "-",
       stock: 10,
       price: 12000,
@@ -192,7 +193,8 @@ async function seed() {
   const productDetail2 = await prisma.product_Detail.create({
     data: {
       product_id: product2.id,
-      photo: "https://res.cloudinary.com/dyua08mya/image/upload/v1701670086/ynwygof3appusaddu2ee.jpg",
+      photo:
+        "https://res.cloudinary.com/dyua08mya/image/upload/v1701670086/ynwygof3appusaddu2ee.jpg",
       color: "-",
       stock: 10,
       price: 10000,
@@ -203,7 +205,8 @@ async function seed() {
   const productDetail3 = await prisma.product_Detail.create({
     data: {
       product_id: product3.id,
-      photo: "https://res.cloudinary.com/dyua08mya/image/upload/v1701670086/ynwygof3appusaddu2ee.jpg",
+      photo:
+        "https://res.cloudinary.com/dyua08mya/image/upload/v1701670086/ynwygof3appusaddu2ee.jpg",
       color: "black",
       stock: 5,
       price: 2500000,
@@ -235,7 +238,7 @@ async function seed() {
       cart_id: cart1.id,
       payment_method_id: paymentMethod.id,
       total_price: 69000,
-      status:"waiting"
+      status: "waiting",
     },
   });
 
