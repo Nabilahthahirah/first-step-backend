@@ -67,6 +67,25 @@ const create = async (params) => {
   }
 };
 
+const uploadPhoto = async (pathParams, data) => {
+  try {
+    const { id } = pathParams;
+    const { upload } = data;
+    const updateUpload = await prisma.payment.update({
+      where: {
+        id: +id,
+      },
+      data: {
+        upload: upload,
+      },
+    });
+    return updateUpload;
+  } catch (error) {
+    console.log(error);
+    throw new CustomAPIError(`${error.message}`, error.statusCode || 500);
+  }
+};
+
 const update = async (pathParams, params) => {
   try {
     const { status } = params;
@@ -136,4 +155,5 @@ module.exports = {
   create,
   update,
   destroy,
+  uploadPhoto,
 };

@@ -6,12 +6,12 @@ const getCartByUserId = async (user_id) => {
     where: { user_id: user_id },
     include: {
       cart_product: {
-        include: { 
+        include: {
           product: {
             include: {
-              product_detail: true
-            }
-          } 
+              product_detail: true,
+            },
+          },
         },
         orderBy: {
           id: "asc", // Order by CartProduct id in ascending order
@@ -85,26 +85,28 @@ const deleteCartProduct = async (userId, productId) => {
     });
 
     if (!user) {
-      throw new CustomAPIError('User not found', 404);
+      throw new CustomAPIError("User not found", 404);
     }
 
     const cart = user.cart;
 
     if (!cart) {
-      throw new CustomAPIError('Cart not found', 404);
+      throw new CustomAPIError("Cart not found", 404);
     }
 
-    const cartProduct = cart.cart_product.find((item) => item.product.id === productId);
+    const cartProduct = cart.cart_product.find(
+      (item) => item.product.id === productId
+    );
 
     if (!cartProduct) {
-      throw new CustomAPIError('Cart product not found', 404);
+      throw new CustomAPIError("Cart product not found", 404);
     }
 
     await prisma.cart_Product.delete({
       where: { id: cartProduct.id },
     });
 
-    return { message: 'Cart product deleted successfully' };
+    return { message: "Cart product deleted successfully" };
   } catch (error) {
     throw new CustomAPIError(error.message, 500);
   }
@@ -118,7 +120,11 @@ const fetchCart = async (user_id) => {
     include: {
       cart_product: {
         include: {
-          product: true
+          product: {
+            include: {
+              product_detail: true,
+            },
+          },
         },
         orderBy: {
           id: "asc", // Order by CartProduct id in ascending order
@@ -130,12 +136,7 @@ const fetchCart = async (user_id) => {
 
 const cartLogic = async (payload) => {
   try {
-    const {
-      id,
-      shipping_cost,
-      product_details,
-      courier,
-    } = payload;
+    const { id, shipping_cost, product_details, courier } = payload;
     console.log(payload);
     const result = await prisma.$transaction(async (tx) => {
       // Find or create a user's cart
@@ -263,5 +264,5 @@ module.exports = {
   deleteCartProduct,
   fetchCart,
   cartLogic,
-  resetCartToDefault
+  resetCartToDefault,
 };
