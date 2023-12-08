@@ -32,10 +32,10 @@ model Address {
   phone         String
   created_at    DateTime      @default(now())
   updated_at    DateTime      @default(now())
-  user          User     @relation(fields: [user_id], references: [id])
+  user          User     @relation(fields: [user_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
   order         Order[]
-  city          City     @relation(fields: [city_id], references: [id])
-  province      Province @relation(fields: [province_id], references: [id])
+  city          City     @relation(fields: [city_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  province      Province @relation(fields: [province_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }
 
 model City {
@@ -44,7 +44,7 @@ model City {
   province_id Int
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
-  province   Province @relation(fields: [province_id], references: [id])
+  province   Province @relation(fields: [province_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
   address    Address[]
   warehouse  Warehouse[]
 }
@@ -88,8 +88,8 @@ model Cart_Product {
   price         Int
   created_at    DateTime      @default(now())
   updated_at    DateTime      @default(now())
-  cart          Cart     @relation(fields: [cart_id], references: [id])
-  product       Product  @relation(fields: [product_id], references: [id])
+  cart          Cart     @relation(fields: [cart_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  product       Product  @relation(fields: [product_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }
 
 model Product {
@@ -138,9 +138,9 @@ model Warehouse {
   created_at    DateTime      @default(now())
   updated_at    DateTime      @default(now())
   product         Product[] 
-  admin           Admin?   @relation(fields: [admin_id], references: [id])
-  province        Province  @relation(fields: [province_id], references: [id])
-  city            City  @relation(fields: [city_id], references: [id])  
+  admin           Admin?   @relation(fields: [admin_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  province        Province  @relation(fields: [province_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  city            City  @relation(fields: [city_id], references: [id], onUpdate: Cascade, onDelete: Cascade)  
 }
 
 model Admin {
@@ -170,8 +170,8 @@ model Payment {
   total_price          Int
   status  paymentStatus
   upload               String?
-  payment_method       Payment_Method @relation(fields: [payment_method_id], references: [id]) 
-  order                Order @relation(fields: [order_id], references:[id] )
+  payment_method       Payment_Method @relation(fields: [payment_method_id], references: [id], onUpdate: Cascade, onDelete: Cascade) 
+  order                Order @relation(fields: [order_id], references:[id], onUpdate: Cascade, onDelete: Cascade )
   created_at  DateTime      @default(now())
   updated_at  DateTime      @default(now())
 }
@@ -189,8 +189,8 @@ model Order {
   shipping_price    Int 
   price             Int 
   payment           Payment[]
-  address           Address @relation(fields: [address_id], references:[id] )
-  cart              Cart @relation(fields: [cart_id], references:[id] )
+  address           Address @relation(fields: [address_id], references:[id], onUpdate: Cascade, onDelete: Cascade )
+  cart              Cart @relation(fields: [cart_id], references:[id], onUpdate: Cascade, onDelete: Cascade )
   order_status      Order_Status[]
   created_at  DateTime      @default(now())
   updated_at  DateTime      @default(now())
@@ -200,7 +200,7 @@ model Order_Status {
   id            Int      @id @default(autoincrement())
   order_id      Int
   status        String 
-  order         Order    @relation(fields: [order_id], references:[id] )
+  order         Order    @relation(fields: [order_id], references:[id], onUpdate: Cascade, onDelete: Cascade )
   created_at  DateTime      @default(now())
   updated_at  DateTime      @default(now())
 }
