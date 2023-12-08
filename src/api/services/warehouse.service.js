@@ -73,16 +73,16 @@ const update = async (admin_id, params) => {
   }
 };
 
-const destroy = async (admin_id) => {
+const destroy = async (params) => {
   const warehouse = await prisma.warehouse.findUnique({
-    where: { id: +admin_id},
+    where: { id: +params.id},
   });
   if (!warehouse) {
-    throw new CustomAPIError("Warehouse with id " + admin_id + " not found", 400);
+    throw new CustomAPIError("Warehouse with id " + params.id + " not found", 400);
   }
   await prisma.warehouse.delete({
     where: {
-      id: +warehouse.id,
+      id: +params.id,
     },
   });
   return {

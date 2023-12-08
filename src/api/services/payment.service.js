@@ -2,8 +2,7 @@ const prisma = require("../../lib/prisma");
 const CustomAPIError = require("../middlewares/custom-error");
 
 const findAll = async (params) => {
-  const payment = await prisma.payment.findMany({
-  });
+  const payment = await prisma.payment.findMany({});
   return payment;
 };
 
@@ -14,7 +13,6 @@ const findOne = async (params) => {
       where: {
         id: +id,
       },
-      include: { upload: true },
     });
 
     if (!payment) {
@@ -24,10 +22,7 @@ const findOne = async (params) => {
     return payment;
   } catch (error) {
     console.log(error);
-    throw new CustomAPIError(
-      `Error: ${error.message}`,
-      error.statusCode || 500
-    );
+    throw new CustomAPIError(`Error: ${error.message}`, error.statusCode || 500);
   }
 };
 
@@ -48,10 +43,7 @@ const findOneByOrder = async (params) => {
     return payment;
   } catch (error) {
     console.log(error);
-    throw new CustomAPIError(
-      `Error: ${error.message}`,
-      error.statusCode || 500
-    );
+    throw new CustomAPIError(`Error: ${error.message}`, error.statusCode || 500);
   }
 };
 

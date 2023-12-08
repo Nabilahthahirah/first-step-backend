@@ -38,7 +38,7 @@ const updateWarehouse = async (req, res) => {
 
 const deleteWarehouse = async (req, res) => {
   try {
-    const warehouse = await warehouseServices.destroy(+req.admin.id);
+    const warehouse = await warehouseServices.destroy(req.params);
     res.status(200).json({
       message: "Delete Warehouse Succesfully",
       data: warehouse,
