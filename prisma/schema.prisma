@@ -154,17 +154,6 @@ model Admin {
   warehouse     Warehouse[]
 }
 
-model Upload {
-  id            Int      @id @default(autoincrement())
-  admin_id      Int 
-  payment_id    Int 
-  photo         String 
-  created_at    DateTime      @default(now())
-  updated_at    DateTime      @default(now())
-  admin         Admin   @relation(fields: [admin_id], references: [id])  
-  payment       Payment   @relation(fields: [payment_id], references: [id])  
-}
-
 model Payment_Method {
   id            Int      @id @default(autoincrement())
   value         String 
