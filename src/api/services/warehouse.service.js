@@ -35,6 +35,8 @@ const create = async (admin_id, params) => {
         address,
         warehouse_name,
         admin_id: admin.id,
+        city_id: 1,
+        province_id: 1,
       },
     });
 
@@ -44,23 +46,24 @@ const create = async (admin_id, params) => {
   }
 };
 
-const update = async (params) => {
+const update = async (admin_id, params) => {
   try {
     const warehouse = await prisma.warehouse.findUnique({
-      where: { id: +params.id },
+      where: { id: +admin_id},
     });
 
     if (!warehouse) {
-      throw new CustomAPIError("Warehouse with id " + params.id + " not found", 400);
+      throw new CustomAPIError("Warehouse with id " + admin_id + " not found", 400);
     }
 
     const { warehouse_name, address } = params;
-
     const updatedWarehouse = await prisma.warehouse.update({
-      where: { id: +params.id },
+      where: { id: +admin_id },
       data: {
         address: address || warehouse.address,
         warehouse_name: warehouse_name || warehouse.warehouse_name,
+        city_id: 1,
+        province_id: 1,
       },
     });
 
@@ -70,12 +73,12 @@ const update = async (params) => {
   }
 };
 
-const destroy = async (params) => {
+const destroy = async (admin_id) => {
   const warehouse = await prisma.warehouse.findUnique({
-    where: { id: +params.id },
+    where: { id: +admin_id},
   });
   if (!warehouse) {
-    throw new CustomAPIError("Warehouse with id " + params.id + " not found", 400);
+    throw new CustomAPIError("Warehouse with id " + admin_id + " not found", 400);
   }
   await prisma.warehouse.delete({
     where: {
