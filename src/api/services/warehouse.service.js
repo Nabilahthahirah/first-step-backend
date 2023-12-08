@@ -46,19 +46,13 @@ const create = async (admin_id, params) => {
   }
 };
 
-const update = async (admin_id, params) => {
+const update = async (pathParams, params) => {
   try {
-    const warehouse = await prisma.warehouse.findUnique({
-      where: { id: +admin_id},
-    });
-
-    if (!warehouse) {
-      throw new CustomAPIError("Warehouse with id " + admin_id + " not found", 400);
-    }
-
+    const { id } = pathParams;
     const { warehouse_name, address } = params;
+
     const updatedWarehouse = await prisma.warehouse.update({
-      where: { id: +admin_id },
+      where: { id: +id },
       data: {
         address: address || warehouse.address,
         warehouse_name: warehouse_name || warehouse.warehouse_name,

@@ -15,13 +15,13 @@ async function seed() {
   // Seed untuk Category
   const category1 = await prisma.category.create({
     data: {
-      category_name: "makanan bayi",
+      category_name: "Makanan bayi",
     },
   });
 
   const category2 = await prisma.category.create({
     data: {
-      category_name: "pakaian Bayi",
+      category_name: "Pakaian Bayi",
     },
   });
 
@@ -127,6 +127,19 @@ async function seed() {
     },
   });
 
+  const cart2 = await prisma.cart.create({
+    data: {
+      user_id: user1.id,
+      shipping_cost: 20000,
+      total_payment: 100000,
+      total_weight: 500,
+      shipping_cost: 20000,
+      total_payment: 100000,
+      total_weight: 500,
+      total_price: 120000,
+    },
+  });
+
   // Seed untuk Product
   const product1 = await prisma.product.create({
     data: {
@@ -217,7 +230,13 @@ async function seed() {
   // Seed untuk Payment_Method
   const paymentMethod = await prisma.payment_Method.create({
     data: {
-      value: "Credit Card",
+      value: "Transfer Bank",
+    },
+  });
+
+  const paymentMethod2 = await prisma.payment_Method.create({
+    data: {
+      value: "QRIS",
     },
   });
 
@@ -231,6 +250,15 @@ async function seed() {
     },
   });
 
+  const order2 = await prisma.order.create({
+    data: {
+      cart_id: cart2.id,
+      address_id: address1.id,
+      shipping_price: 15000,
+      price: 154000,
+    },
+  });
+
   // Seed untuk Payment
   const payment1 = await prisma.payment.create({
     data: {
@@ -239,6 +267,18 @@ async function seed() {
       payment_method_id: paymentMethod.id,
       total_price: 69000,
       status: "waiting",
+      upload: "https://res.cloudinary.com/dyua08mya/image/upload/v1701670086/ynwygof3appusaddu2ee.jpg",
+    },
+  });
+
+  const payment2 = await prisma.payment.create({
+    data: {
+      order_id: order1.id,
+      cart_id: cart1.id,
+      payment_method_id: paymentMethod.id,
+      total_price: 69000,
+      status: "waiting",
+      upload: "https://res.cloudinary.com/dyua08mya/image/upload/v1701670086/ynwygof3appusaddu2ee.jpg",
     },
   });
 
@@ -246,6 +286,13 @@ async function seed() {
   const orderStatus = await prisma.order_Status.create({
     data: {
       order_id: order1.id,
+      status: "Pending",
+    },
+  });
+
+  const orderStatus1 = await prisma.order_Status.create({
+    data: {
+      order_id: order2.id,
       status: "Pending",
     },
   });

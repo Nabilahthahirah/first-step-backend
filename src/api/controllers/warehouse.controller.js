@@ -26,10 +26,10 @@ const newWarehouse = async (req, res) => {
 
 const updateWarehouse = async (req, res) => {
   try {
-    const warehouse = await warehouseServices.update(+req.admin.id, req.body);
+    const warehouse = await warehouseServices.update(req.params, req.body);
     res.status(200).json({
       message: "Update Warehouse Succesfully",
-      data:warehouse,
+      data: warehouse,
     });
   } catch (error) {
     throw error;
@@ -52,5 +52,5 @@ module.exports = {
   getAllWarehouse,
   newWarehouse,
   updateWarehouse,
-  deleteWarehouse
+  deleteWarehouse,
 };
