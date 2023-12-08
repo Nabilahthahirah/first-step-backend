@@ -73,7 +73,6 @@ const postUser = async (data) => {
           cart: true,
         },
       });
-
       const userId = createdUser.id
 
       if (createdUser) {

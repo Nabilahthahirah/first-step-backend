@@ -335,7 +335,6 @@ const putProductWithDetail = async (id, data) => {
   }
 };
 
-
 module.exports = {
     fetchAllProducts,
     postFullProduct,

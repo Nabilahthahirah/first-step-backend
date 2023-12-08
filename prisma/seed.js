@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
@@ -241,3 +242,9 @@ seed()
   .finally(async () => {
     await prisma.$disconnect();
   });
+=======
+const { PrismaClient } = require("@prisma/client");
+
+const prisma = new PrismaClient();
+
+>>>>>>> 803888c85a091e0c7e722ac868f236ed174cff74
