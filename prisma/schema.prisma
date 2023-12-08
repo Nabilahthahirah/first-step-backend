@@ -24,7 +24,6 @@ model User {
 
 model Address {
   id            Int      @id @default(autoincrement())
-<<<<<<< HEAD
   user_id       Int      
   address       String  
   city_id       Int
@@ -33,16 +32,6 @@ model Address {
   phone         String
   created_at    DateTime      @default(now())
   updated_at    DateTime      @default(now())
-=======
-  user_id       Int      @unique
-  address       String
-  city_id       Int
-  province_id   Int
-  postal_code   String
-  phone         String
-  created_at    DateTime @default(now())
-  updated_at    DateTime @default(now())
->>>>>>> 803888c85a091e0c7e722ac868f236ed174cff74
   user          User     @relation(fields: [user_id], references: [id])
   order         Order[]
   city          City     @relation(fields: [city_id], references: [id])
@@ -141,7 +130,6 @@ model Category {
 
 model Warehouse {
   id              Int      @id @default(autoincrement())
-<<<<<<< HEAD
   admin_id        Int? 
   warehouse_name  String 
   address         String 
@@ -153,20 +141,6 @@ model Warehouse {
   admin           Admin?   @relation(fields: [admin_id], references: [id])
   province        Province  @relation(fields: [province_id], references: [id])
   city            City  @relation(fields: [city_id], references: [id])  
-=======
-  admin_id        Int?
-  warehouse_name  String
-  address         String
-  province_id     Int
-  city_id         Int
-  created_at      DateTime @default(now())
-  updated_at      DateTime @default(now())
-  product         Product[]
-  admin           Admin?    @relation(fields: [admin_id], references: [id])
-  province        Province  @relation(fields: [province_id], references: [id])
-  city            City  @relation(fields: [city_id], references: [id])
-
->>>>>>> 803888c85a091e0c7e722ac868f236ed174cff74
 }
 
 model Admin {
@@ -178,10 +152,6 @@ model Admin {
   created_at    DateTime      @default(now())
   updated_at    DateTime      @default(now())
   warehouse     Warehouse[]
-<<<<<<< HEAD
-=======
-  upload        Upload[]
->>>>>>> 803888c85a091e0c7e722ac868f236ed174cff74
 }
 
 model Upload {
@@ -209,27 +179,20 @@ model Payment {
   cart_id              Int 
   payment_method_id    Int 
   total_price          Int
-<<<<<<< HEAD
   status  paymentStatus
   upload               String?
-=======
-  upload               Upload[]
->>>>>>> 803888c85a091e0c7e722ac868f236ed174cff74
   payment_method       Payment_Method @relation(fields: [payment_method_id], references: [id]) 
   order                Order @relation(fields: [order_id], references:[id] )
   created_at  DateTime      @default(now())
   updated_at  DateTime      @default(now())
 }
 
-<<<<<<< HEAD
 enum paymentStatus {
   accepted
   rejected
   waiting
 }
 
-=======
->>>>>>> 803888c85a091e0c7e722ac868f236ed174cff74
 model Order {
   id                Int      @id @default(autoincrement())
   cart_id           Int 
