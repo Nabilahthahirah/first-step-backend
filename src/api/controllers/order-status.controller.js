@@ -21,6 +21,29 @@ const getAllOrderStatus = async (req, res) => {
   }
 }
 
+const getOrderStatusById = async (req, res) => {
+
+  const {id} = req.params
+
+  try {
+
+    const orders = await orderStatusServices.findOrderStatusById(id)
+
+    if (orders.length === 0) {
+      throw new CustomAPIError(`No Order was found`, 400)
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Get Order",
+      data: orders,
+    })
+
+  } catch (error) {
+    throw new CustomAPIError(`Error: ${error.message}`, error.statusCode || 500)
+  }
+}
+
 
 const updateOrderStatus = async (req, res) => {
   try {
@@ -45,5 +68,6 @@ const updateOrderStatus = async (req, res) => {
 
 module.exports = {
   getAllOrderStatus,
+  getOrderStatusById,
   updateOrderStatus
 }
