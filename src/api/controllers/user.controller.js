@@ -20,6 +20,18 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+const getUserDetail = async (req, res) => {
+  try {
+    const users = await userServices.fetchUserDetail(+req.user.id);
+    res.status(200).json({
+      message: "Get User Detail succesfully",
+      data: users,
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
 const getUserId = async (req, res) => {
   const user = await userServices.fetchSingleUsersById(req.user);
   return res.json({
@@ -67,52 +79,53 @@ const deleteUser = async (req, res) => {
 };
 
 const getProvince = async (req, res) => {
-  const province = await userServices.fetchProvince()
+  const province = await userServices.fetchProvince();
   return res.json({
     status: "success",
     message: "Get province successfully",
     data: province,
   });
-}
+};
 
 const getCity = async (req, res) => {
-  const {province_id} = req.params
+  const { province_id } = req.params;
 
-  const city = await userServices.fetchCity(province_id)
-  
+  const city = await userServices.fetchCity(province_id);
+
   return res.json({
     status: "success",
     message: "Get city successfully",
     data: city,
   });
-}
+};
 
 const getProvinceById = async (req, res) => {
-  const {id} = req.params
+  const { id } = req.params;
 
-  const province = await userServices.fetchProvinceById(id)
+  const province = await userServices.fetchProvinceById(id);
 
   return res.json({
     status: "success",
     message: "Get province successfully",
     data: province,
   });
-}
+};
 
 const getCityById = async (req, res) => {
-  const {id} = req.params
+  const { id } = req.params;
 
-  const city = await userServices.fetchCityById(id)
-  
+  const city = await userServices.fetchCityById(id);
+
   return res.json({
     status: "success",
     message: "Get city successfully",
     data: city,
   });
-}
+};
 
 module.exports = {
   getAllUsers,
+  getUserDetail,
   getUserId,
   registerUser,
   loginUser,
