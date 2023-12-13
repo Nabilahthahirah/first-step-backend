@@ -13,6 +13,24 @@ const fetchAllUsers = async () => {
   return users;
 };
 
+const fetchUserDetail = async (id) => {
+  try {
+    const users = await prisma.user.findMany({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!users[0]) {
+      throw new CustomAPIError(`No User with id of ${id}`, 400);
+    }
+
+    return users;
+  } catch (error) {
+    throw new CustomAPIError(`Error creating category: ${error.message}`, 500);
+  }
+};
+
 const fetchSingleUsersById = async (params) => {
   const { id } = params;
   const user = await prisma.user.findUnique({
@@ -247,6 +265,7 @@ const fetchCityById = async (id) => {
 
 module.exports = {
   fetchAllUsers,
+  fetchUserDetail,
   fetchSingleUsersById,
   postUser,
   getUser,

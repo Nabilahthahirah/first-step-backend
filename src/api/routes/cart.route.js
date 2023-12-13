@@ -2,7 +2,7 @@ const {
   showCart,
   deleteCart,
   addToCart,
-  resetCart
+  resetCart,
 } = require("../controllers/cart.controller");
 const { verifyTokenUser } = require("../middlewares/verifyTokenMiddleware");
 
@@ -12,5 +12,6 @@ const router = require("express").Router();
 router.get("/", verifyTokenUser, showCart);
 router.post("/", verifyTokenUser, addToCart);
 router.delete("/", verifyTokenUser, deleteCart);
-router.post("/", verifyTokenUser, resetCart);
+router.put("/reset", verifyTokenUser, resetCart);
 module.exports = router;
+

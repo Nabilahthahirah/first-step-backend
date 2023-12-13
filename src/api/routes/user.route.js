@@ -3,6 +3,7 @@ const { verifyTokenUser, verifyTokenAdmin } = require("../middlewares/verifyToke
 
 const router = require("express").Router();
 router.get("/", controllers.getAllUsers);
+router.get("/detail", verifyTokenUser, controllers.getUserDetail);
 router.get("/province", controllers.getProvince);
 router.get("/province/:id", controllers.getProvinceById);
 router.get("/city/province/:province_id", controllers.getCity);
