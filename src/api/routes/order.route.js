@@ -8,4 +8,6 @@ router.get("/:id", controllers.getOneOrder)
 router.post("/", controllers.createOrder)
 router.delete("/:id", controllers.deleteOrder)
 
+router.get("/user/:id", controllers.getUserbyOrder);
+
 module.exports = router

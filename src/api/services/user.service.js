@@ -48,16 +48,7 @@ const fetchSingleUsersById = async (params) => {
 };
 
 const postUser = async (data) => {
-  let {
-    username,
-    email,
-    password,
-    phone,
-    address,
-    city_id,
-    province_id,
-    postal_code,
-  } = data;
+  let { username, email, password, phone, address, city_id, province_id, postal_code } = data;
 
   try {
     const existedUserUsername = await prisma.user.findFirst({
@@ -188,21 +179,21 @@ const putUser = async (pathParams, params) => {
 };
 
 const destroyUser = async (params) => {
-  // console.log(params);
   try {
-    const { id } = params;
-
     const user = await prisma.user.findUnique({
-      where: { id: +id },
+      where: { id: +params.id },
+      
     });
 
     if (!user) {
-      throw new CustomAPIError(`No user with id ${id}`, 400);
+      throw new CustomAPIError(`No user with id ${params.id}`, 400);
     }
+
+    console.log(params.id)
 
     await prisma.user.delete({
       where: {
-        id: +id,
+        id: +params.id,
       },
       include: { address: true, cart: true },
     });
@@ -212,10 +203,7 @@ const destroyUser = async (params) => {
     };
   } catch (error) {
     console.log(error);
-    throw new CustomAPIError(
-      `Error: ${error.message}`,
-      error.statusCode || 500
-    );
+    throw new CustomAPIError(`Error: ${error.message}`, error.statusCode || 500);
   }
 };
 
@@ -226,10 +214,7 @@ const fetchProvince = async () => {
     return province;
   } catch (error) {
     console.log(error);
-    throw new CustomAPIError(
-      `Error: ${error.message}`,
-      error.statusCode || 500
-    );
+    throw new CustomAPIError(`Error: ${error.message}`, error.statusCode || 500);
   }
 };
 
@@ -244,10 +229,7 @@ const fetchCity = async (province_id) => {
     return city;
   } catch (error) {
     console.log(error);
-    throw new CustomAPIError(
-      `Error: ${error.message}`,
-      error.statusCode || 500
-    );
+    throw new CustomAPIError(`Error: ${error.message}`, error.statusCode || 500);
   }
 };
 
@@ -262,10 +244,7 @@ const fetchProvinceById = async (id) => {
     return province;
   } catch (error) {
     console.log(error);
-    throw new CustomAPIError(
-      `Error: ${error.message}`,
-      error.statusCode || 500
-    );
+    throw new CustomAPIError(`Error: ${error.message}`, error.statusCode || 500);
   }
 };
 
@@ -280,10 +259,7 @@ const fetchCityById = async (id) => {
     return city;
   } catch (error) {
     console.log(error);
-    throw new CustomAPIError(
-      `Error: ${error.message}`,
-      error.statusCode || 500
-    );
+    throw new CustomAPIError(`Error: ${error.message}`, error.statusCode || 500);
   }
 };
 

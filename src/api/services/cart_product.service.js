@@ -67,7 +67,7 @@ const createCartProduct = async (authUserId, product_id, quantity, price) => {
         data: {
           product_id: product_id,
           cart_id: cart_id,
-          quantity: quantity,
+          quantity: +quantity,
           price: price,
         },
       });

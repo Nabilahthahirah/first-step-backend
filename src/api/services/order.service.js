@@ -82,7 +82,6 @@ const findOneOrderByCart = async (params) => {
   }
 }
 
-
 const createOrder = async (cart_id, productPrice, shippingCost) => {
   try {
 
@@ -198,10 +197,40 @@ const destroyOrder = async (params) => {
   }
 }
 
+const findUsernameEmailbyOrder = async (params) => {
+  try {
+    const { id } = params
+    const order = await prisma.order.findUnique({
+      where: {
+        id: +id,
+      },
+      include: { cart: { include: { user: true } } },
+    })
+
+    if (!order) {
+      throw new CustomAPIError(`No Order with id ${id} was found`, 400)
+    }
+
+    const username = order.cart.user.username; // Mendapatkan username dari order
+    const email = order.cart.user.email;
+
+    const result = {
+      username,
+      email
+    };
+
+    return result;
+  } catch (error) {
+    console.log(error)
+    throw new CustomAPIError(`Error: ${error.message}`, error.statusCode || 500)
+  }
+}
+
 module.exports = {
     findAllOrders,
     findOneOrder,
     findOneOrderByCart,
     createOrder,
-    destroyOrder
+    destroyOrder,
+    findUsernameEmailbyOrder
 }

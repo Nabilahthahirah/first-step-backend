@@ -91,10 +91,27 @@ const deleteOrder = async (req, res) => {
   }
 }
 
+const getUserbyOrder = async (req, res) => {
+  try {
+
+    const orders = await orderServices.findUsernameEmailbyOrder(req.params)
+  
+    res.status(200).json({
+        status: "success",
+        message: "Get Orders",
+        data: orders,
+    })
+
+  } catch (error) {
+    throw new CustomAPIError(`Error: ${error.message}`, error.statusCode || 500)
+  }
+}
+
 module.exports = {
   getAllOrders,
   getOneOrder,
   getOneOrderByCart,
   createOrder,
-  deleteOrder
+  deleteOrder,
+  getUserbyOrder
 }

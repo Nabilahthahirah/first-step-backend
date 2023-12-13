@@ -10,6 +10,19 @@ const findAllOrderStatuses = async () => {
   }
 }
 
+const findOrderStatusById = async (id) => {
+  try {
+    const orderStatuses = await prisma.Order_Status.findUnique({
+      where: {
+        id: +id
+      }
+    })
+    return orderStatuses
+  } catch (error) {
+    throw error
+  }
+}
+
 const updateOrderStatus = async (status, id) => {
 
   try {
@@ -35,6 +48,7 @@ const updateOrderStatus = async (status, id) => {
 
 module.exports = {
   findAllOrderStatuses,
+  findOrderStatusById,
   updateOrderStatus,
 }
 
