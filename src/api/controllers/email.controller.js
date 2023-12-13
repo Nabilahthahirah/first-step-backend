@@ -7,6 +7,7 @@ const sendEmail = async (req, res) => {
   console.log(req.body);
   // return
   const { to_name, from_name, subject, message, to_email } = req.body;
+  console.log(to_name, from_name, subject, message, to_email)
   try {
     await emailjs.send(
       process.env.SERVICE_ID_EMAIL,

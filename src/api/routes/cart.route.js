@@ -12,5 +12,5 @@ const router = require("express").Router();
 router.get("/", verifyTokenUser, showCart);
 router.post("/", verifyTokenUser, addToCart);
 router.delete("/", verifyTokenUser, deleteCart);
-// router.post("/", verifyTokenUser, resetCart);
+router.post("/", verifyTokenUser, resetCart);
 module.exports = router;

@@ -14,10 +14,11 @@ const {
 } = require("../controllers/product.controller");
 const router = require("express").Router();
 
+//commen getallproduct -single product
 // router.get("/", getAllProducts);
-router.post("/", createProduct);
-router.get("/search", getAllProductsBySearch);
-router.get("/category/:category_id", getAllProductsByCategory);
+// router.post("/", createProduct);
+// router.get("/search", getAllProductsBySearch);
+// router.get("/category/:category_id", getAllProductsByCategory);
 // router.get("/:id", getSingleProduct);
 router.delete("/:id", deleteProduct);
 

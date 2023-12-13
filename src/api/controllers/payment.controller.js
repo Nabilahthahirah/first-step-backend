@@ -17,10 +17,7 @@ const getAllpayments = async (req, res) => {
       data: payments,
     });
   } catch (error) {
-    throw new CustomAPIError(
-      `Error: ${error.message}`,
-      error.statusCode || 500
-    );
+    throw new CustomAPIError(`Error: ${error.message}`, error.statusCode || 500);
   }
 };
 
@@ -71,15 +68,10 @@ const newPayments = async (req, res) => {
         response: JSON.stringify(transaction),
       };
       const token = transaction.token;
-      res
-        .status(200)
-        .json({ message: "Success", dataPayment, token: token, newPayments });
+      res.status(200).json({ message: "Success", dataPayment, token: token, newPayments });
     });
   } catch (error) {
-    throw new CustomAPIError(
-      `Error creating payment: ${error.message}`,
-      error.statusCode || 500
-    );
+    throw new CustomAPIError(`Error creating payment: ${error.message}`, error.statusCode || 500);
   }
 };
 
@@ -100,10 +92,7 @@ const updatePhoto = async (req, res) => {
         }
         const upload = result.secure_url;
         req.body.upload = upload;
-        const updatedUploads = await paymentServices.uploadPhoto(
-          req.params,
-          req.body
-        );
+        const updatedUploads = await paymentServices.uploadPhoto(req.params, req.body);
         res.status(200).json({
           status: "success",
           message: "Update Upload Succesfully",
@@ -112,10 +101,7 @@ const updatePhoto = async (req, res) => {
       });
     });
   } catch (error) {
-    throw new CustomAPIError(
-      `Error creating upload: ${error.message}`,
-      error.statusCode || 500
-    );
+    throw new CustomAPIError(`Error creating upload: ${error.message}`, error.statusCode || 500);
   }
 };
 
@@ -128,10 +114,7 @@ const updatePayment = async (req, res) => {
       data: payment,
     });
   } catch (error) {
-    throw new CustomAPIError(
-      `Error: ${error.message}`,
-      error.statusCode || 500
-    );
+    throw new CustomAPIError(`Error: ${error.message}`, error.statusCode || 500);
   }
 };
 

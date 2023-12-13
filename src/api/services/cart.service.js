@@ -225,37 +225,46 @@ const cartLogic = async (payload) => {
 };
 
 const resetCartToDefault = async (userId) => {
-  await prisma.$transaction([
-    prisma.cart.update({
+  try {
+    await prisma.$transaction([
+      prisma.cart_Product.deleteMany({
+        where: {
+          cart: {
+            user_id: userId,
+          },
+        },
+      }),
+      prisma.cart.update({
+        where: { user_id: userId },
+        data: {
+          shipping_cost: null,
+          total_payment: 0,
+          total_weight: 0,
+          total_price: 0,
+          courier: null,
+          cart_product: {
+            deleteMany: {}, // Menghapus semua produk dari keranjang
+          },
+        },
+        include: {
+          user: true,
+          cart_product: true,
+        },
+      }),
+    ]);
+
+    return prisma.cart.findUnique({
       where: { user_id: userId },
-      data: {
-        shipping_cost: null,
-        total_payment: 0,
-        total_weight: 0,
-        total_price: 0,
-        courier: null,
-      },
       include: {
         user: true,
         cart_product: true,
       },
-    }),
-    prisma.cart_Product.deleteMany({
-      where: {
-        cart: {
-          user_id: userId,
-        },
-      },
-    }),
-  ]);
-
-  return prisma.cart.findUnique({
-    where: { user_id: userId },
-    include: {
-      user: true,
-      cart_product: true,
-    },
-  });
+    });
+  } catch (error) {
+    // Penanganan kesalahan di sini
+    console.error("Terjadi kesalahan saat mereset keranjang belanja:", error);
+    throw error;
+  }
 };
 
 module.exports = {
