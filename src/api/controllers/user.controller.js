@@ -1,3 +1,4 @@
+//src/api/controller/user.controller.js
 const CustomAPIError = require("../middlewares/custom-error");
 const userServices = require("../services/user.service");
 
@@ -21,12 +22,24 @@ const getAllUsers = async (req, res) => {
 };
 
 const getUserId = async (req, res) => {
-  const user = await userServices.fetchSingleUsersById(req.user);
-  return res.json({
-    status: "success",
-    message: `User Id ${req.user} is getted`,
-    data: user,
-  });
+  try {
+    const userId = req.user.id;
+
+    if (!userId) {
+      throw new CustomAPIError('User information is missing in the request', 400);
+    }
+
+    const user = await userServices.fetchSingleUsersById(userId);
+
+    return res.json({
+      status: "success",
+      message: `User Id ${userId} is getted`,
+      data: user,
+    });
+  } catch (error) {
+    console.error('Error getting user:', error);
+    res.status(error.statusCode || 500).json({ message: error.message || 'Internal Server Error' });
+  }
 };
 
 const registerUser = async (req, res) => {

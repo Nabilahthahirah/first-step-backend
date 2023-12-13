@@ -1,3 +1,4 @@
+//src/api/services/user.service.js
 const prisma = require("../../lib/prisma");
 const bcrypt = require("bcryptjs");
 const CustomAPIError = require("../middlewares/custom-error");
@@ -13,20 +14,22 @@ const fetchAllUsers = async () => {
   return users;
 };
 
-const fetchSingleUsersById = async (params) => {
-  const { id } = params;
-  const user = await prisma.user.findUnique({
-    where: { id: +id },
-    include: {
-      cart: { include: { cart: true } },
-      address: true,
-    },
-  });
+const fetchSingleUsersById = async (id) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: Number(id) },
+      include: { cart: true, address: true },
+    });
 
-  if (!user) {
-    throw new CustomAPIError(`No user with id ${id}`, 400);
+    if (!user) {
+      throw new CustomAPIError(`No user with id ${id}`, 400);
+    }
+    
+    return user;
+  } catch (error) {
+    console.error('Error getting user:', error);
+    throw new CustomAPIError('Internal server error', 500);
   }
-  return user;
 };
 
 const postUser = async (data) => {
@@ -130,48 +133,50 @@ const getUser = async (data) => {
 };
 
 const putUser = async (pathParams, params) => {
-    try {
-        const { id } = pathParams;
-    
-        const user = await prisma.user.findUnique({
-            where: { id: +id },
-        });
+  try {
+      const { id } = pathParams;
+      const { email, password, username, phone } = params;
 
-        console.log(user);
-        if (!user) {
-            throw new CustomAPIError(`no user with id of ${id}`, 400);
-        }
-    
-        const {
-            username,
-            email,
-            password,
-            phone,
-        } = params;
-        console.log(params);
-        if (password) {
-            var hashedPassword = await bcrypt.hash(password, 10);
-        }
-        await prisma.user.update({
-            where: {
-            id: +id,
-            },
-            data: {
-            username: username || user.username,
-            email: email || user.email,
-            password: hashedPassword || user.password,
-            phone: phone || user.phone,
-            },
-        });
-    
-        const updateUser = await prisma.user.findUnique({
-            where: { id: +id },
-        });
-        return updateUser;
-    } catch (error) {
-        console.log(error);
-        throw new CustomAPIError(`Error: ${error.message}`, 500);
-    }
+      // Validasi apakah email yang baru tidak bertentangan dengan email pengguna lain
+      const existingUser = await prisma.user.findFirst({
+          where: { email: email, id: { not: +id } },
+      });
+
+      if (existingUser) {
+          throw new CustomAPIError('Email is already taken', 400);
+      }
+
+      const user = await prisma.user.findUnique({
+          where: { id: +id },
+      });
+
+      if (!user) {
+          throw new CustomAPIError(`No user with id of ${id}`, 400);
+      }
+
+      // Hash the password using bcrypt if it's provided
+      let hashedPassword;
+      if (password) {
+          hashedPassword = await bcrypt.hash(password, 10);
+      }
+
+      // Continue with the update data as usual
+      const updatedUser = await prisma.user.update({
+          where: { id: +id },
+          data: {
+              username: username || user.username,
+              email: email || user.email,
+              password: hashedPassword || user.password,
+              phone: phone || user.phone,
+              // ... Other update data
+          },
+      });
+
+      return updatedUser;
+  } catch (error) {
+      console.log(error);
+      throw new CustomAPIError(`Error: ${error.message}`, 500);
+  }
 };
 
 const destroyUser = async (params) => {

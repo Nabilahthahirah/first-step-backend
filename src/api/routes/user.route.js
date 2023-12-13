@@ -1,3 +1,4 @@
+//src/api/routes/user.route.js
 const controllers = require("../controllers/user.controller");
 const { verifyTokenUser } = require("../middlewares/verifyTokenMiddleware");
 
@@ -7,7 +8,7 @@ router.get("/province", controllers.getProvince);
 router.get("/province/:id", controllers.getProvinceById);
 router.get("/city/province/:province_id", controllers.getCity);
 router.get("/city/:id", controllers.getCityById);
-router.get("/:id", controllers.getUserId);
+router.get("/view", verifyTokenUser, controllers.getUserId);
 router.post("/register", controllers.registerUser);
 router.post("/login", controllers.loginUser);
 router.put("/", verifyTokenUser, controllers.updateUser);

@@ -1,3 +1,4 @@
+//src/api/middleware/verifyTokenMiddleware.js
 const { verifyToken } = require("../../lib/jwt");
 const prisma = require("../../lib/prisma");
 const CustomAPIError = require("./custom-error");
